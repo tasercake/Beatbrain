@@ -343,14 +343,14 @@ def load_dataset(
     Args:
         path (str): The file or directory to load data from
         flip (bool): Whether to flip loaded images
-        batch_size:
-        shuffle_buffer:
-        prefetch:
-        parallel:
-        limit:
+        batch_size (int):
+        shuffle_buffer (int):
+        prefetch (int):
+        parallel (bool):
+        limit (int):
 
     Returns:
-
+        A `tf.data.Dataset` instance
     """
     num_parallel = tf.data.experimental.AUTOTUNE if parallel else None
     path = Path(path).resolve()
