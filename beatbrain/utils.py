@@ -1,15 +1,16 @@
-import warnings
 import enum
-import numpy as np
+import math
 import librosa
 import imageio
+import warnings
+import numpy as np
 import soundfile as sf
+import tensorflow as tf
 from pathlib import Path
 from natsort import natsorted
 from colorama import Fore
 from tqdm import tqdm
 from audioread.exceptions import DecodeError
-import tensorflow as tf
 
 from . import settings
 
@@ -42,7 +43,7 @@ EXTENSIONS = {
 
 def _decode_tensor_string(tensor):
     try:
-        return tensor.numpy().decode('utf8')
+        return tensor.numpy().decode("utf8")
     except:
         return tensor
 
@@ -170,7 +171,9 @@ def load_images(path, flip=True, concatenate=False, stack=False):
         stack (bool): Whether to stack the loaded arrays
     """
     if concatenate and stack:
-        raise ValueError("Cannot do both concatenation and stacking: choose one or neither.")
+        raise ValueError(
+            "Cannot do both concatenation and stacking: choose one or neither."
+        )
     path = _decode_tensor_string(path)
     path = Path(path)
     if path.is_file():
@@ -198,7 +201,9 @@ def load_arrays(path, concatenate=False, stack=False):
         stack (bool): Whether to stack the loaded arrays
     """
     if concatenate and stack:
-        raise ValueError("Cannot do both concatenation and stacking: choose one or neither.")
+        raise ValueError(
+            "Cannot do both concatenation and stacking: choose one or neither."
+        )
     path = _decode_tensor_string(path)
     with np.load(path) as npz:
         keys = natsorted(npz.keys())
@@ -335,7 +340,8 @@ def load_dataset(
     shuffle_buffer=settings.SHUFFLE_BUFFER,
     prefetch=settings.DATA_PREFETCH,
     parallel=settings.DATA_PARALLEL,
-    limit=None,
+    test_split=0.2,
+    subset=None,
 ):
     """
     Loads a one or more images or .np{y,z} files as a `tf.data.Dataset` instance.
@@ -347,7 +353,8 @@ def load_dataset(
         shuffle_buffer (int):
         prefetch (int):
         parallel (bool):
-        limit (int):
+        test_split (float):
+        subset (int):
 
     Returns:
         A `tf.data.Dataset` instance
@@ -359,14 +366,18 @@ def load_dataset(
     dtype = get_data_type(path)
     supported_dtypes = (DataType.NUMPY, DataType.IMAGE)
     if dtype not in supported_dtypes:
-        raise TypeError(f"Unsupported or ambiguous data type: {dtype}."
-                        f"Must be one of {supported_dtypes}.")
+        raise TypeError(
+            f"Unsupported or ambiguous data type: {dtype}."
+            f"Must be one of {supported_dtypes}."
+        )
     # dataset = tf.data.Dataset.list_files(f"{path}" if path.is_file() else f"{path}/**/*.*", shuffle=shuffle)
     files = []
     if path.is_file():
         files.append(path)
     elif path.is_dir():
         files.extend(get_paths(path, directories=False))
+    if subset:
+        files = files[:subset]
     files = [str(f) for f in files]
     dataset = tf.data.Dataset.from_tensor_slices(files)
     if shuffle_buffer:
@@ -378,35 +389,39 @@ def load_dataset(
         )
     elif dtype == DataType.NUMPY:
         dataset = dataset.map(
-            lambda file: tf.py_function(load_arrays, [file, False, True], Tout=tf.float32),
+            lambda file: tf.py_function(
+                load_arrays, [file, False, True], Tout=tf.float32
+            ),
             num_parallel_calls=num_parallel,
         )
         dataset = dataset.unbatch()
-    dataset = dataset.map(lambda x: tf.expand_dims(x, -1), num_parallel_calls=num_parallel)
+    dataset = dataset.map(
+        lambda x: tf.expand_dims(x, -1), num_parallel_calls=num_parallel
+    )
     dataset = dataset.batch(batch_size, drop_remainder=True)
     if prefetch:
         dataset = dataset.prefetch(prefetch)
-    if limit:
-        dataset = dataset.take(limit)
-    return dataset
+    train = dataset.skip(math.floor(len(files) * test_split))
+    test = dataset.take(math.floor(len(files) * test_split))
+    return train, test
 
 
 # endregion
 
 # region Converters
 def convert_audio_to_numpy(
-        inp,
-        out_dir,
-        sr=settings.SAMPLE_RATE,
-        offset=settings.AUDIO_OFFSET,
-        duration=settings.AUDIO_DURATION,
-        res_type=settings.RESAMPLE_TYPE,
-        n_fft=settings.N_FFT,
-        hop_length=settings.HOP_LENGTH,
-        n_mels=settings.N_MELS,
-        chunk_size=settings.CHUNK_SIZE,
-        truncate=settings.TRUNCATE,
-        skip=0,
+    inp,
+    out_dir,
+    sr=settings.SAMPLE_RATE,
+    offset=settings.AUDIO_OFFSET,
+    duration=settings.AUDIO_DURATION,
+    res_type=settings.RESAMPLE_TYPE,
+    n_fft=settings.N_FFT,
+    hop_length=settings.HOP_LENGTH,
+    n_mels=settings.N_MELS,
+    chunk_size=settings.CHUNK_SIZE,
+    truncate=settings.TRUNCATE,
+    skip=0,
 ):
     paths = get_paths(inp, directories=False)
     print(f"Converting files in {Fore.YELLOW}'{inp}'{Fore.RESET} to Numpy arrays...")
@@ -449,19 +464,19 @@ def convert_image_to_numpy(inp, out_dir, flip=settings.IMAGE_FLIP, skip=0):
 
 
 def convert_audio_to_image(
-        inp,
-        out_dir,
-        sr=settings.SAMPLE_RATE,
-        offset=settings.AUDIO_OFFSET,
-        duration=settings.AUDIO_DURATION,
-        res_type=settings.RESAMPLE_TYPE,
-        n_fft=settings.N_FFT,
-        hop_length=settings.HOP_LENGTH,
-        n_mels=settings.N_MELS,
-        chunk_size=settings.CHUNK_SIZE,
-        truncate=settings.TRUNCATE,
-        flip=settings.IMAGE_FLIP,
-        skip=0,
+    inp,
+    out_dir,
+    sr=settings.SAMPLE_RATE,
+    offset=settings.AUDIO_OFFSET,
+    duration=settings.AUDIO_DURATION,
+    res_type=settings.RESAMPLE_TYPE,
+    n_fft=settings.N_FFT,
+    hop_length=settings.HOP_LENGTH,
+    n_mels=settings.N_MELS,
+    chunk_size=settings.CHUNK_SIZE,
+    truncate=settings.TRUNCATE,
+    flip=settings.IMAGE_FLIP,
+    skip=0,
 ):
     paths = get_paths(inp, directories=False)
     print(f"Converting files in {Fore.YELLOW}'{inp}'{Fore.RESET} to images...")
@@ -504,15 +519,15 @@ def convert_numpy_to_image(inp, out_dir, flip=settings.IMAGE_FLIP, skip=0):
 
 
 def convert_numpy_to_audio(
-        inp,
-        out_dir,
-        sr=settings.SAMPLE_RATE,
-        n_fft=settings.N_FFT,
-        hop_length=settings.HOP_LENGTH,
-        fmt=settings.AUDIO_FORMAT,
-        offset=settings.AUDIO_OFFSET,
-        duration=settings.AUDIO_DURATION,
-        skip=0,
+    inp,
+    out_dir,
+    sr=settings.SAMPLE_RATE,
+    n_fft=settings.N_FFT,
+    hop_length=settings.HOP_LENGTH,
+    fmt=settings.AUDIO_FORMAT,
+    offset=settings.AUDIO_OFFSET,
+    duration=settings.AUDIO_DURATION,
+    skip=0,
 ):
     paths = get_paths(inp, directories=False)
     print(f"Converting files in {Fore.YELLOW}'{inp}'{Fore.RESET} to audio...")
@@ -530,16 +545,16 @@ def convert_numpy_to_audio(
 
 
 def convert_image_to_audio(
-        inp,
-        out_dir,
-        sr=settings.SAMPLE_RATE,
-        n_fft=settings.N_FFT,
-        hop_length=settings.HOP_LENGTH,
-        fmt=settings.AUDIO_FORMAT,
-        offset=settings.AUDIO_OFFSET,
-        duration=settings.AUDIO_DURATION,
-        flip=settings.IMAGE_FLIP,
-        skip=0,
+    inp,
+    out_dir,
+    sr=settings.SAMPLE_RATE,
+    n_fft=settings.N_FFT,
+    hop_length=settings.HOP_LENGTH,
+    fmt=settings.AUDIO_FORMAT,
+    offset=settings.AUDIO_OFFSET,
+    duration=settings.AUDIO_DURATION,
+    flip=settings.IMAGE_FLIP,
+    skip=0,
 ):
     paths = get_paths(inp, directories=True)
     print(f"Converting files in {Fore.YELLOW}'{inp}'{Fore.RESET} to audio...")
@@ -560,19 +575,19 @@ def convert_image_to_audio(
 
 # region Functions used by the `click` CLI
 def convert_to_numpy(
-        inp,
-        out_dir,
-        sr=settings.SAMPLE_RATE,
-        offset=settings.AUDIO_OFFSET,
-        duration=settings.AUDIO_DURATION,
-        res_type=settings.RESAMPLE_TYPE,
-        n_fft=settings.N_FFT,
-        hop_length=settings.HOP_LENGTH,
-        n_mels=settings.N_MELS,
-        chunk_size=settings.CHUNK_SIZE,
-        truncate=settings.TRUNCATE,
-        flip=settings.IMAGE_FLIP,
-        skip=0,
+    inp,
+    out_dir,
+    sr=settings.SAMPLE_RATE,
+    offset=settings.AUDIO_OFFSET,
+    duration=settings.AUDIO_DURATION,
+    res_type=settings.RESAMPLE_TYPE,
+    n_fft=settings.N_FFT,
+    hop_length=settings.HOP_LENGTH,
+    n_mels=settings.N_MELS,
+    chunk_size=settings.CHUNK_SIZE,
+    truncate=settings.TRUNCATE,
+    flip=settings.IMAGE_FLIP,
+    skip=0,
 ):
     dtype = get_data_type(inp, raise_exception=True)
     if dtype == DataType.AUDIO:
@@ -595,18 +610,18 @@ def convert_to_numpy(
 
 
 def convert_to_image(
-        inp,
-        out_dir,
-        sr=settings.SAMPLE_RATE,
-        offset=settings.AUDIO_OFFSET,
-        duration=settings.AUDIO_DURATION,
-        res_type=settings.RESAMPLE_TYPE,
-        n_fft=settings.N_FFT,
-        hop_length=settings.HOP_LENGTH,
-        chunk_size=settings.CHUNK_SIZE,
-        truncate=settings.TRUNCATE,
-        flip=settings.IMAGE_FLIP,
-        skip=0,
+    inp,
+    out_dir,
+    sr=settings.SAMPLE_RATE,
+    offset=settings.AUDIO_OFFSET,
+    duration=settings.AUDIO_DURATION,
+    res_type=settings.RESAMPLE_TYPE,
+    n_fft=settings.N_FFT,
+    hop_length=settings.HOP_LENGTH,
+    chunk_size=settings.CHUNK_SIZE,
+    truncate=settings.TRUNCATE,
+    flip=settings.IMAGE_FLIP,
+    skip=0,
 ):
     dtype = get_data_type(inp, raise_exception=True)
     if dtype == DataType.AUDIO:
@@ -629,16 +644,16 @@ def convert_to_image(
 
 
 def convert_to_audio(
-        inp,
-        out_dir,
-        sr=settings.SAMPLE_RATE,
-        n_fft=settings.N_FFT,
-        hop_length=settings.HOP_LENGTH,
-        fmt=settings.AUDIO_FORMAT,
-        offset=settings.AUDIO_OFFSET,
-        duration=settings.AUDIO_DURATION,
-        flip=settings.IMAGE_FLIP,
-        skip=0,
+    inp,
+    out_dir,
+    sr=settings.SAMPLE_RATE,
+    n_fft=settings.N_FFT,
+    hop_length=settings.HOP_LENGTH,
+    fmt=settings.AUDIO_FORMAT,
+    offset=settings.AUDIO_OFFSET,
+    duration=settings.AUDIO_DURATION,
+    flip=settings.IMAGE_FLIP,
+    skip=0,
 ):
     dtype = get_data_type(inp, raise_exception=True)
     if dtype == DataType.NUMPY:
@@ -666,5 +681,6 @@ def convert_to_audio(
             flip=flip,
             skip=skip,
         )
+
 
 # endregion

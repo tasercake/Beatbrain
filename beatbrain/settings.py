@@ -43,7 +43,7 @@ EXAMPLES_TO_GENERATE = 16
 
 # Data Options
 CHANNELS_LAST = True
-SHUFFLE_BUFFER = 1024  # Buffer size for shuffling data samples
+SHUFFLE_BUFFER = 50000  # Buffer size for shuffling data samples
 DATA_PREFETCH = 32  # Data samples to prefetch
 DATA_PARALLEL = True  # Parallelize data pre-processing (can be resource-intensive)
 
