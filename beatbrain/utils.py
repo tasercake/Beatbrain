@@ -396,7 +396,8 @@ def load_dataset(
         )
         dataset = dataset.unbatch()
     dataset = dataset.map(
-        lambda x: tf.expand_dims(x, -1), num_parallel_calls=num_parallel
+        lambda x: tf.py_function(tf.expand_dims, [x, -1], Tout=tf.float32),
+        num_parallel_calls=num_parallel,
     )
     dataset = dataset.batch(batch_size, drop_remainder=True)
     if prefetch:
