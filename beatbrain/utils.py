@@ -1,11 +1,11 @@
-import warnings
-
-warnings.simplefilter("ignore", UserWarning)
 import enum
-import numpy as np
+import math
 import librosa
 import imageio
+import warnings
+import numpy as np
 import soundfile as sf
+import tensorflow as tf
 from pathlib import Path
 from natsort import natsorted
 from colorama import Fore
@@ -14,6 +14,7 @@ from audioread.exceptions import DecodeError
 
 from . import settings
 
+warnings.simplefilter("ignore", UserWarning)
 imageio.plugins.freeimage.download()
 
 
@@ -36,8 +37,15 @@ EXTENSIONS = {
         "ogg",
     ],  # TODO: Remove artificial limit on supported audio formats
     DataType.NUMPY: ["npy", "npz"],
-    DataType.IMAGE: ["exr"],
+    DataType.IMAGE: ["tiff", "exr"],
 }
+
+
+def _decode_tensor_string(tensor):
+    try:
+        return tensor.numpy().decode("utf8")
+    except:
+        return tensor
 
 
 def get_data_type(path, raise_exception=False):
@@ -88,20 +96,21 @@ def get_data_type(path, raise_exception=False):
 # endregion
 
 # region Helper functions
-def get_paths(inp, parents=False, sort=True):
+def get_paths(inp, directories=False, sort=True):
     """
     Recursively get the filenames under a given path
 
     Args:
         inp (str): The path to search for files under
-        parents (bool): If True, return the unique parent directories of the found files
+        directories (bool): If True, return the unique parent directories of the found files
+        sort (bool): Whether to sort the paths
     """
     inp = Path(inp)
     if not inp.exists():
         raise ValueError(f"Input must be a valid file or directory. Got '{inp}'")
     elif inp.is_dir():
         paths = filter(Path.is_file, inp.rglob("*"))
-        if parents:
+        if directories:
             paths = {p.parent for p in paths}  # Unique parent directories
         paths = natsorted(paths) if sort else list(paths)
     else:
@@ -119,6 +128,7 @@ def split_spectrogram(spec, chunk_size, truncate=True, axis=1):
         truncate (bool): If True, the array is truncated such that the number of elements
                          along the chosen axis is a multiple of `chunk_size`.
                          Otherwise, the array is zero-padded to a multiple of `chunk_size`.
+        axis (int): The axis along which to split the array
 
     Returns:
         list: A list of arrays of equal size
@@ -143,20 +153,28 @@ def load_image(path, flip=True):
         path: The file to load image from
         flip (bool): Whether to flip the image vertically
     """
+    path = _decode_tensor_string(path)
     spec = imageio.imread(path)
     if flip:
         spec = spec[::-1]
     return spec
 
 
-def load_images(path, flip=True, join=False):
+def load_images(path, flip=True, concatenate=False, stack=False):
     """
     Load a sequence of spectrogram images from a directory as arrays
 
     Args:
         path: The directory to load images from
         flip (bool): Whether to flip the images vertically
+        concatenate (bool): Whether to concatenate the loaded arrays (along axis 1)
+        stack (bool): Whether to stack the loaded arrays
     """
+    if concatenate and stack:
+        raise ValueError(
+            "Cannot do both concatenation and stacking: choose one or neither."
+        )
+    path = _decode_tensor_string(path)
     path = Path(path)
     if path.is_file():
         files = [path]
@@ -166,20 +184,35 @@ def load_images(path, flip=True, join=False):
             files.extend(path.glob(f"*.{ext}"))
         files = natsorted(files)
     chunks = [load_image(file, flip=flip) for file in files]
-    return np.concatenate(chunks, axis=1) if join else chunks
+    if concatenate:
+        return np.concatenate(chunks, axis=1)
+    elif stack:
+        return np.stack(chunks)
+    return chunks
 
 
-def load_arrays(path, join=False):
+def load_arrays(path, concatenate=False, stack=False):
     """
     Load a sequence of spectrogram arrays from a npy or npz file
 
     Args:
         path: The file to load arrays from
+        concatenate (bool): Whether to concatenate the loaded arrays (along axis 1)
+        stack (bool): Whether to stack the loaded arrays
     """
+    if concatenate and stack:
+        raise ValueError(
+            "Cannot do both concatenation and stacking: choose one or neither."
+        )
+    path = _decode_tensor_string(path)
     with np.load(path) as npz:
         keys = natsorted(npz.keys())
         chunks = [npz[k] for k in keys]
-        return np.concatenate(chunks, axis=1) if join else chunks
+    if concatenate:
+        return np.concatenate(chunks, axis=1)
+    elif stack:
+        return np.stack(chunks)
+    return chunks
 
 
 def audio_to_spectrogram(audio, normalize=False, norm_kwargs={}, **kwargs):
@@ -224,7 +257,7 @@ def denormalize_spectrogram(spec, top_db=settings.TOP_DB, ref=32768, **kwargs):
     """
     Exp and denormalize a mel spectrogram using `librosa.db_to_power()`
     """
-    return librosa.db_to_power((spec - 1) * top_db, ref=ref)
+    return librosa.db_to_power((spec - 1) * top_db, ref=ref, **kwargs)
 
 
 def save_arrays(chunks, output, compress=True):
@@ -249,7 +282,6 @@ def save_image(spec, output, flip=True):
         output (str): The path to save the image to
         flip (bool): Whether to flip the array vertically
     """
-    output = Path(output)
     if flip:
         spec = spec[::-1]
     imageio.imwrite(output, spec, format="exr")
@@ -264,6 +296,7 @@ def save_images(chunks, output, flip=True):
         output (str): The directory to save the images to
         flip (bool): Whether to flip the images vertically
     """
+    output = Path(output)
     for j, chunk in enumerate(chunks):
         save_image(chunk, output.joinpath(f"{j}.exr"), flip=flip)
 
@@ -299,6 +332,81 @@ def get_audio_output_path(path, out_dir, inp, fmt):
     return output
 
 
+def load_dataset(
+    path,
+    flip=settings.IMAGE_FLIP,
+    batch_size=settings.BATCH_SIZE,
+    shuffle=True,
+    shuffle_buffer=settings.SHUFFLE_BUFFER,
+    prefetch=settings.DATA_PREFETCH,
+    parallel=settings.DATA_PARALLEL,
+    test_split=0.2,
+    subset=None,
+):
+    """
+    Loads a one or more images or .np{y,z} files as a `tf.data.Dataset` instance.
+
+    Args:
+        path (str): The file or directory to load data from
+        flip (bool): Whether to flip loaded images
+        batch_size (int):
+        shuffle_buffer (int):
+        prefetch (int):
+        parallel (bool):
+        test_split (float):
+        subset (int):
+
+    Returns:
+        A `tf.data.Dataset` instance
+    """
+    num_parallel = tf.data.experimental.AUTOTUNE if parallel else None
+    path = Path(path).resolve()
+    if not path.exists():
+        raise ValueError(f"Could not find '{path}'")
+    dtype = get_data_type(path)
+    supported_dtypes = (DataType.NUMPY, DataType.IMAGE)
+    if dtype not in supported_dtypes:
+        raise TypeError(
+            f"Unsupported or ambiguous data type: {dtype}."
+            f"Must be one of {supported_dtypes}."
+        )
+    # dataset = tf.data.Dataset.list_files(f"{path}" if path.is_file() else f"{path}/**/*.*", shuffle=shuffle)
+    files = []
+    if path.is_file():
+        files.append(path)
+    elif path.is_dir():
+        files.extend(get_paths(path, directories=False))
+    if subset:
+        files = files[:subset]
+    files = [str(f) for f in files]
+    dataset = tf.data.Dataset.from_tensor_slices(files)
+    if shuffle_buffer:
+        dataset = dataset.shuffle(shuffle_buffer)
+    if dtype == DataType.IMAGE:
+        dataset = dataset.map(
+            lambda file: tf.py_function(load_image, [file, flip], Tout=tf.float32),
+            num_parallel_calls=num_parallel,
+        )
+    elif dtype == DataType.NUMPY:
+        dataset = dataset.map(
+            lambda file: tf.py_function(
+                load_arrays, [file, False, True], Tout=tf.float32
+            ),
+            num_parallel_calls=num_parallel,
+        )
+        dataset = dataset.unbatch()
+    dataset = dataset.map(
+        lambda x: tf.py_function(tf.expand_dims, [x, -1], Tout=tf.float32),
+        num_parallel_calls=num_parallel,
+    )
+    dataset = dataset.batch(batch_size, drop_remainder=True)
+    if prefetch:
+        dataset = dataset.prefetch(prefetch)
+    train = dataset.skip(math.floor(len(files) * test_split))
+    test = dataset.take(math.floor(len(files) * test_split))
+    return train, test
+
+
 # endregion
 
 # region Converters
@@ -316,7 +424,7 @@ def convert_audio_to_numpy(
     truncate=settings.TRUNCATE,
     skip=0,
 ):
-    paths = get_paths(inp, parents=False)
+    paths = get_paths(inp, directories=False)
     print(f"Converting files in {Fore.YELLOW}'{inp}'{Fore.RESET} to Numpy arrays...")
     print(f"Arrays will be saved in {Fore.YELLOW}'{out_dir}'{Fore.RESET}\n")
     for i, path in enumerate(tqdm(paths, desc="Converting")):
@@ -344,7 +452,7 @@ def convert_audio_to_numpy(
 
 
 def convert_image_to_numpy(inp, out_dir, flip=settings.IMAGE_FLIP, skip=0):
-    paths = get_paths(inp, parents=True)
+    paths = get_paths(inp, directories=True)
     print(f"Converting files in {Fore.YELLOW}'{inp}'{Fore.RESET} to Numpy arrays...")
     print(f"Arrays will be saved in {Fore.YELLOW}'{out_dir}'{Fore.RESET}\n")
     for i, path in enumerate(tqdm(paths, desc="Converting")):
@@ -371,7 +479,7 @@ def convert_audio_to_image(
     flip=settings.IMAGE_FLIP,
     skip=0,
 ):
-    paths = get_paths(inp, parents=False)
+    paths = get_paths(inp, directories=False)
     print(f"Converting files in {Fore.YELLOW}'{inp}'{Fore.RESET} to images...")
     print(f"Images will be saved in {Fore.YELLOW}'{out_dir}'{Fore.RESET}\n")
     for i, path in enumerate(tqdm(paths, desc="Converting")):
@@ -399,7 +507,7 @@ def convert_audio_to_image(
 
 
 def convert_numpy_to_image(inp, out_dir, flip=settings.IMAGE_FLIP, skip=0):
-    paths = get_paths(inp, parents=False)
+    paths = get_paths(inp, directories=False)
     print(f"Converting files in {Fore.YELLOW}'{inp}'{Fore.RESET} to images...")
     print(f"Images will be saved in {Fore.YELLOW}'{out_dir}'{Fore.RESET}\n")
     for i, path in enumerate(tqdm(paths, desc="Converting")):
@@ -422,14 +530,14 @@ def convert_numpy_to_audio(
     duration=settings.AUDIO_DURATION,
     skip=0,
 ):
-    paths = get_paths(inp, parents=False)
+    paths = get_paths(inp, directories=False)
     print(f"Converting files in {Fore.YELLOW}'{inp}'{Fore.RESET} to audio...")
     print(f"Images will be saved in {Fore.YELLOW}'{out_dir}'{Fore.RESET}\n")
     for i, path in enumerate(tqdm(paths, desc="Converting")):
         if i < skip:
             continue
         tqdm.write(f"Converting {Fore.YELLOW}'{path}'{Fore.RESET}...")
-        spec = load_arrays(path, join=True)
+        spec = load_arrays(path, concatenate=True)
         audio = spectrogram_to_audio(
             spec, sr=sr, n_fft=n_fft, hop_length=hop_length, denormalize=True,
         )
@@ -449,14 +557,14 @@ def convert_image_to_audio(
     flip=settings.IMAGE_FLIP,
     skip=0,
 ):
-    paths = get_paths(inp, parents=True)
+    paths = get_paths(inp, directories=True)
     print(f"Converting files in {Fore.YELLOW}'{inp}'{Fore.RESET} to audio...")
     print(f"Images will be saved in {Fore.YELLOW}'{out_dir}'{Fore.RESET}\n")
     for i, path in enumerate(tqdm(paths, desc="Converting")):
         if i < skip:
             continue
         tqdm.write(f"Converting {Fore.YELLOW}'{path}'{Fore.RESET}...")
-        spec = load_images(path, flip=flip, join=True)
+        spec = load_images(path, flip=flip, concatenate=True)
         audio = spectrogram_to_audio(
             spec, sr=sr, n_fft=n_fft, hop_length=hop_length, denormalize=True,
         )
