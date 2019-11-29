@@ -11,6 +11,7 @@ requirements = [
     "click",
     "numpy",
     "Pillow",
+    "imageio",
     "natsort",
     "ffmpeg",
     "librosa",
@@ -28,6 +29,7 @@ dev_requirements = [
     "parametrized",
     "pytest",
     "pre-commit",
+    "jupyter",
 ]
 
 with open("README.md", "r") as fh:
@@ -47,4 +49,7 @@ setuptools.setup(
     python_requires=">=3.7",
     install_requires=requirements,
     extras_require={"dev": dev_requirements,},
+    entry_points={
+    "console_scripts": ["beatbrain=beatbrain.cli:main"]
+    }
 )
