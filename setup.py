@@ -26,6 +26,7 @@ requirements = [
 
 dev_requirements = [
     "black",
+    "nb_black",
     "parametrized",
     "pytest",
     "pre-commit",
@@ -49,7 +50,5 @@ setuptools.setup(
     python_requires=">=3.7",
     install_requires=requirements,
     extras_require={"dev": dev_requirements,},
-    entry_points={
-    "console_scripts": ["beatbrain=beatbrain.cli:main"]
-    }
+    entry_points={"console_scripts": ["beatbrain=beatbrain.cli:main"]},
 )

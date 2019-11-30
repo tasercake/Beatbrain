@@ -340,7 +340,7 @@ def load_dataset(
     shuffle_buffer=settings.SHUFFLE_BUFFER,
     prefetch=settings.DATA_PREFETCH,
     parallel=settings.DATA_PARALLEL,
-    test_split=0.2,
+    #     test_split=0.2,
     subset=None,
 ):
     """
@@ -402,9 +402,9 @@ def load_dataset(
     dataset = dataset.batch(batch_size, drop_remainder=True)
     if prefetch:
         dataset = dataset.prefetch(prefetch)
-    train = dataset.skip(math.floor(len(files) * test_split))
-    test = dataset.take(math.floor(len(files) * test_split))
-    return train, test
+    #     train = dataset.skip(math.floor(len(files) * test_split))
+    #     test = dataset.take(math.floor(len(files) * test_split))
+    return dataset
 
 
 # endregion

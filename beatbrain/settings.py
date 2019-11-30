@@ -45,7 +45,7 @@ EXAMPLES_TO_GENERATE = 16
 CHANNELS_LAST = True
 SHUFFLE_BUFFER = 50000  # Buffer size for shuffling data samples
 DATA_PREFETCH = 32  # Data samples to prefetch
-DATA_PARALLEL = True  # Parallelize data pre-processing (can be resource-intensive)
+DATA_PARALLEL = False  # Parallelize data pre-processing (can be resource-intensive)
 
 # CLI Defaults
 AUDIO_OFFSET = 0.0
