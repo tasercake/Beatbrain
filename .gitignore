@@ -228,5 +228,4 @@ dmypy.json
 
 # Data, Models, and Logs
 data
-*.h5
 logs/
