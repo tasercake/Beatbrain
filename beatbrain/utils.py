@@ -336,11 +336,10 @@ def load_dataset(
     path,
     flip=settings.IMAGE_FLIP,
     batch_size=settings.BATCH_SIZE,
-    shuffle=True,
     shuffle_buffer=settings.SHUFFLE_BUFFER,
     prefetch=settings.DATA_PREFETCH,
     parallel=settings.DATA_PARALLEL,
-    test_split=0.2,
+    #     test_split=0.2,
     subset=None,
 ):
     """
@@ -370,7 +369,6 @@ def load_dataset(
             f"Unsupported or ambiguous data type: {dtype}."
             f"Must be one of {supported_dtypes}."
         )
-    # dataset = tf.data.Dataset.list_files(f"{path}" if path.is_file() else f"{path}/**/*.*", shuffle=shuffle)
     files = []
     if path.is_file():
         files.append(path)
@@ -402,9 +400,9 @@ def load_dataset(
     dataset = dataset.batch(batch_size, drop_remainder=True)
     if prefetch:
         dataset = dataset.prefetch(prefetch)
-    train = dataset.skip(math.floor(len(files) * test_split))
-    test = dataset.take(math.floor(len(files) * test_split))
-    return train, test
+    #     train = dataset.skip(math.floor(len(files) * test_split))
+    #     test = dataset.take(math.floor(len(files) * test_split))
+    return dataset
 
 
 # endregion
