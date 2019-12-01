@@ -226,9 +226,6 @@ dmypy.json
 
 # End of https://www.gitignore.io/api/python,pycharm+all,jupyternotebooks
 
-# data
+# Data, Models, and Logs
 data
-*.h5
-
-# tensorboard
-**/tensorboard
+logs/
