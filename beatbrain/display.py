@@ -4,7 +4,7 @@ import numpy as np
 import librosa
 
 
-def show_spec(spec, scale_fn=librosa.power_to_db, title=None, clean=True, **kwargs):
+def show_spec(spec, scale_fn=librosa.power_to_db, title=None, clean=True, flip=True, **kwargs):
     """
     Display a spectrogram
 
@@ -15,11 +15,13 @@ def show_spec(spec, scale_fn=librosa.power_to_db, title=None, clean=True, **kwar
         clean (bool): If True, removes axis labels, colorbar, etc.
         **kwargs (dict): Additional keyword arguments passed to `sns.heatmap`
     """
+    if flip:
+        spec = spec[::-1]
     if scale_fn:
         spec = scale_fn(spec, ref=np.max)
     kwargs["cmap"] = kwargs.get("cmap") or "magma"
     sns.heatmap(
-        spec[::-1],
+        spec,
         cbar_kws={"format": "%+2.0f dB"},
         xticklabels=not clean,
         yticklabels=not clean,
