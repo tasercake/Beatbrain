@@ -445,6 +445,9 @@ def convert_audio_to_numpy(
             normalize=True,
         )
         chunks = split_spectrogram(spec, chunk_size, truncate=truncate)
+        if truncate and chunks[0].shape[1] < chunk_size:
+            print(f"Skipping {path}: not enough time frames")
+            continue
         output = get_numpy_output_path(path, out_dir, inp)
         save_arrays(chunks, output)
 
@@ -500,6 +503,9 @@ def convert_audio_to_image(
             normalize=True,
         )
         chunks = split_spectrogram(spec, chunk_size, truncate=truncate)
+        if truncate and chunks[0].shape[1] < chunk_size:
+            print(f"Skipping {path}: not enough time frames")
+            continue
         output = get_image_output_path(path, out_dir, inp)
         save_images(chunks, output, flip=flip)
 
