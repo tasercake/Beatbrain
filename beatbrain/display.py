@@ -25,7 +25,7 @@ def show_spec(spec, scale_fn=librosa.power_to_db, title=None, clean=True, flip=T
         cbar_kws={"format": "%+2.0f dB"},
         xticklabels=not clean,
         yticklabels=not clean,
-        cbar=not clean,
+        # cbar=not clean,
         **kwargs
     )
     plt.title(title)
