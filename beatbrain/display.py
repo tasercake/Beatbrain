@@ -22,6 +22,8 @@ def show_spec(spec, scale_fn=librosa.power_to_db, title=None, clean=True, flip=T
     kwargs["cmap"] = kwargs.get("cmap") or "magma"
     sns.heatmap(
         spec,
+        vmin=-80,
+        vmax=0,
         cbar_kws={"format": "%+2.0f dB"},
         xticklabels=not clean,
         yticklabels=not clean,
