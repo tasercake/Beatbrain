@@ -7,7 +7,7 @@ import numpy as np
 import tensorflow as tf
 from PIL import Image
 
-from .. import settings
+from .. import defaults
 
 
 # region Pre-processing Functions
@@ -41,7 +41,7 @@ def audio_to_spec(audio, n_fft, hop_length, n_mels):
     spec = librosa.feature.melspectrogram(
         audio, n_fft=n_fft, hop_length=hop_length, n_mels=n_mels
     )
-    spec = librosa.power_to_db(spec, top_db=settings.TOP_DB, ref=np.max)
+    spec = librosa.power_to_db(spec, top_db=defaults.TOP_DB, ref=np.max)
     spec = spec - spec.min()
     spec = spec / np.abs(spec).max()
     # ==============================================================================
@@ -91,19 +91,19 @@ def make_windows(array, window_size):
 
 def load_dataset(
     data_root,
-    sample_rate=settings.SAMPLE_RATE,
-    resample_type=settings.RESAMPLE_TYPE,
-    n_fft=settings.N_FFT,
-    hop_length=settings.HOP_LENGTH,
-    n_mels=settings.N_MELS,
-    chunk_size=settings.CHUNK_SIZE,
-    channels_last=settings.CHANNELS_LAST,
-    window_size=settings.WINDOW_SIZE,
-    batch_size=settings.BATCH_SIZE,
-    shuffle_buffer=settings.SHUFFLE_BUFFER,
-    prefetch=settings.DATA_PREFETCH,
+    sample_rate=defaults.SAMPLE_RATE,
+    resample_type=defaults.RESAMPLE_TYPE,
+    n_fft=defaults.N_FFT,
+    hop_length=defaults.HOP_LENGTH,
+    n_mels=defaults.N_MELS,
+    chunk_size=defaults.CHUNK_SIZE,
+    channels_last=defaults.CHANNELS_LAST,
+    window_size=defaults.WINDOW_SIZE,
+    batch_size=defaults.BATCH_SIZE,
+    shuffle_buffer=defaults.SHUFFLE_BUFFER,
+    prefetch=defaults.DATA_PREFETCH,
     cache=False,
-    data_parallel=settings.DATA_PARALLEL,
+    data_parallel=defaults.DATA_PARALLEL,
     limit=None,
 ):
     """
@@ -130,7 +130,7 @@ def load_dataset(
     Returns:
         A `tf.data.Dataset` instance
     """
-    num_parallel = settings.NUM_CPUS if data_parallel else None
+    num_parallel = defaults.NUM_CPUS if data_parallel else None
     data_root = pathlib.Path(data_root).resolve()
     files = natsorted(map(str, filter(pathlib.Path.is_file, data_root.iterdir())))
     dataset = tf.data.Dataset.from_tensor_slices(files)
@@ -177,13 +177,13 @@ def load_dataset(
 
 def load_numpy_dataset(
     data_root,
-    channels_last=settings.CHANNELS_LAST,
-    window_size=settings.WINDOW_SIZE,
-    batch_size=settings.BATCH_SIZE,
-    shuffle_buffer=settings.SHUFFLE_BUFFER,
-    prefetch=settings.DATA_PREFETCH,
-    data_parallel=settings.DATA_PARALLEL,
-    test_fraction=settings.TEST_FRACTION,
+    channels_last=defaults.CHANNELS_LAST,
+    window_size=defaults.WINDOW_SIZE,
+    batch_size=defaults.BATCH_SIZE,
+    shuffle_buffer=defaults.SHUFFLE_BUFFER,
+    prefetch=defaults.DATA_PREFETCH,
+    data_parallel=defaults.DATA_PARALLEL,
+    test_fraction=defaults.TEST_FRACTION,
     return_tuples=False,
     limit=None,
 ):

@@ -8,7 +8,7 @@ from tqdm import tqdm
 from PIL import Image
 
 from . import data_utils
-from .. import settings
+from .. import defaults
 
 tf.compat.v1.enable_eager_execution()
 
@@ -47,7 +47,7 @@ def visualize_model_outputs(model, epoch, test_input, output):
     print(f"Saving Samples Images to {output}")
     for i, pred in enumerate(predictions):
         progress_dir = (
-            Path(settings.MODEL_WEIGHTS or datetime.now().strftime("%Y%m%d-%H%M%S"))
+            Path(defaults.MODEL_WEIGHTS or datetime.now().strftime("%Y%m%d-%H%M%S"))
             .resolve()
             .stem
         )
@@ -60,10 +60,10 @@ def visualize_model_outputs(model, epoch, test_input, output):
 class CVAE(tf.keras.Model):
     def __init__(
         self,
-        latent_dim=settings.LATENT_DIMS,
+        latent_dim=defaults.LATENT_DIMS,
         num_conv=2,
-        image_dims=(settings.CHUNK_SIZE, settings.N_MELS),
-        window_size=settings.WINDOW_SIZE,
+        image_dims=(defaults.CHUNK_SIZE, defaults.N_MELS),
+        window_size=defaults.WINDOW_SIZE,
         num_filters=32,
         max_filters=64,
         kernel_size=3,
@@ -142,24 +142,24 @@ class CVAE(tf.keras.Model):
         return eps * tf.exp(logvar * 0.5) + mean
 
 
-train_dataset, test_dataset = data_utils.load_numpy_dataset(settings.TRAIN_DATA_DIR)
+train_dataset, test_dataset = data_utils.load_numpy_dataset(defaults.TRAIN_DATA_DIR)
 
 optimizer = tf.keras.optimizers.Adam(1e-4)
 model = CVAE(num_conv=4)
-if os.path.exists(settings.MODEL_WEIGHTS):
-    print(f"Loading weights from '{settings.MODEL_WEIGHTS}'")
-    model.load_weights(settings.MODEL_WEIGHTS)
+if os.path.exists(defaults.MODEL_WEIGHTS):
+    print(f"Loading weights from '{defaults.MODEL_WEIGHTS}'")
+    model.load_weights(defaults.MODEL_WEIGHTS)
 
 num_train = num_test = 0
 generation_vector = tf.random.normal(
-    shape=[settings.EXAMPLES_TO_GENERATE, model.latent_dims]
+    shape=[defaults.EXAMPLES_TO_GENERATE, model.latent_dims]
 )
-visualiziation_output_dir = os.path.join(settings.OUTPUT_DIR, "progress")
+visualiziation_output_dir = os.path.join(defaults.OUTPUT_DIR, "progress")
 visualize_model_outputs(model, 0, generation_vector, visualiziation_output_dir)
 
-for epoch in range(1, settings.EPOCHS + 1):
+for epoch in range(1, defaults.EPOCHS + 1):
     start = time.time()
-    print(f"Training | Epoch {epoch} / {settings.EPOCHS}...")
+    print(f"Training | Epoch {epoch} / {defaults.EPOCHS}...")
     for train_x in tqdm(train_dataset, total=num_train or None):
         compute_apply_gradients(model, train_x, optimizer)
         if epoch == 1:
@@ -182,9 +182,9 @@ for epoch in range(1, settings.EPOCHS + 1):
         )
         # Save Model Weights
         os.makedirs(
-            os.path.dirname(settings.MODEL_WEIGHTS), exist_ok=True
+            os.path.dirname(defaults.MODEL_WEIGHTS), exist_ok=True
         )  # Create dir if it doesn't exist
-        model.save_weights(settings.MODEL_WEIGHTS)
+        model.save_weights(defaults.MODEL_WEIGHTS)
         # Save Generated Samples
         visualize_model_outputs(
             model, epoch, generation_vector, visualiziation_output_dir

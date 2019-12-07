@@ -10,7 +10,7 @@ from tqdm import tqdm
 from PIL import Image
 
 from . import data_utils
-from .. import settings
+from .. import defaults
 
 tf.compat.v1.enable_eager_execution()
 
@@ -49,7 +49,7 @@ def visualize_model_outputs(mdl, epoch, test_input, output):
     print(f"Saving Samples Images to {output}")
     for i, pred in enumerate(predictions):
         progress_dir = (
-            Path(settings.MODEL_WEIGHTS or datetime.now().strftime("%Y%m%d-%H%M%S"))
+            Path(defaults.MODEL_WEIGHTS or datetime.now().strftime("%Y%m%d-%H%M%S"))
             .resolve()
             .stem
         )
@@ -81,10 +81,10 @@ def vae_loss(mean, logvar, img_dims):
 
 
 # region Model hyperparameters
-window_size = settings.WINDOW_SIZE
-image_dims = [settings.CHUNK_SIZE, settings.N_MELS]
+window_size = defaults.WINDOW_SIZE
+image_dims = [defaults.CHUNK_SIZE, defaults.N_MELS]
 input_shape = [*image_dims, window_size]
-latent_dims = settings.LATENT_DIMS
+latent_dims = defaults.LATENT_DIMS
 num_conv = 2
 num_filters = 32
 max_filters = 64
@@ -92,8 +92,8 @@ kernel_size = 3
 # endregion
 
 # region Training hyperparameters
-num_epochs = settings.EPOCHS
-batch_size = settings.BATCH_SIZE
+num_epochs = defaults.EPOCHS
+batch_size = defaults.BATCH_SIZE
 # endregion
 
 # region Model definition
@@ -149,7 +149,7 @@ vae.summary()
 
 # region Train and evaluate
 train_dataset, test_dataset = data_utils.load_numpy_dataset(
-    settings.TRAIN_DATA_DIR, return_tuples=True
+    defaults.TRAIN_DATA_DIR, return_tuples=True
 )
 
 start = time.time()
