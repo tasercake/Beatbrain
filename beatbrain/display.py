@@ -2,7 +2,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import librosa
+import librosa.display
+import IPython.display as ipd
 
+from . import defaults
 
 def show_spec(spec, scale_fn=librosa.power_to_db, title=None, clean=True, flip=True, **kwargs):
     """
