@@ -5,8 +5,8 @@ import imageio
 import numpy as np
 from natsort import natsorted
 
-from .misc import DataType, EXTENSIONS
-from .. import defaults
+from beatbrain import defaults
+from beatbrain.utils.misc import DataType, EXTENSIONS
 
 
 def split_spectrogram(spec, chunk_size, truncate=True, axis=1):

@@ -9,8 +9,8 @@ from datetime import datetime
 from tqdm import tqdm
 from PIL import Image
 
-from . import data_utils
-from .. import defaults
+from beatbrain.model import data_utils
+from beatbrain import defaults
 
 tf.compat.v1.enable_eager_execution()
 

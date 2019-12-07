@@ -7,9 +7,9 @@ from colorama import Fore
 from natsort import natsorted
 from audioread import DecodeError
 
-from .. import defaults
-from .misc import DataType, EXTENSIONS
-from .core import (
+from beatbrain import defaults
+from beatbrain.utils.misc import DataType, EXTENSIONS
+from beatbrain.utils.core import (
     save_images,
     load_image,
     load_images,

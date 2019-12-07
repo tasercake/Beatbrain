@@ -7,7 +7,7 @@ import numpy as np
 import tensorflow as tf
 from PIL import Image
 
-from .. import defaults
+from beatbrain import defaults
 
 
 # region Pre-processing Functions
