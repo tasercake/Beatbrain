@@ -1,8 +1,8 @@
 import click
 
 import beatbrain.utils.data
-from .. import defaults
-from ..utils import core
+from beatbrain import defaults
+from beatbrain.utils import core
 
 
 @click.group(invoke_without_command=True, short_help="Data Conversion Utilities")
