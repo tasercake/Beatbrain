@@ -8,6 +8,7 @@
 
 # CDS_Report 
 Please refer to the pdf document called CDS_report.
+Direct link: https://github.com/tasercake/BeatBrain/blob/master/CDS%20report.pdf
 
 # Installing
 
