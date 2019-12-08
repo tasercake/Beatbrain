@@ -6,7 +6,7 @@
 ![BeatBrain Logo](images/logo/256h/BeatBrain_Fit_256x.png)
 
 
-# Report 
+# CDS_Report 
 Please refer to the pdf document called CDS_report.
 
 # Installing
