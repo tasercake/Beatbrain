@@ -6,6 +6,9 @@
 ![BeatBrain Logo](images/logo/256h/BeatBrain_Fit_256x.png)
 
 
+# Report 
+Please refer to the pdf document called CDS_report.
+
 # Installing
 
 Ideally, create a [virtualenv](https://uoa-eresearch.github.io/eresearch-cookbook/recipe/2014/11/26/python-virtual-env/) or [conda](https://uoa-eresearch.github.io/eresearch-cookbook/recipe/2014/11/20/conda/) env before you begin.
