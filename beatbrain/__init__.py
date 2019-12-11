@@ -4,3 +4,4 @@ from beatbrain import metrics
 from beatbrain import display
 from beatbrain import fma
 from beatbrain import model
+from beatbrain import config

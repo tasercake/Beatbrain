@@ -1,6 +1,7 @@
 import click
 
 import beatbrain.utils.data
+from beatbrain.config import Config
 from beatbrain import defaults
 
 
@@ -20,7 +21,12 @@ def model(ctx):
 
 @model.command(name="train", short_help="Train a model")
 @click.option(
-    "-c", "--config", help="Config file that defines the model", show_default=True,
+    "-c",
+    "--config",
+    help="Config file that defines the model",
+    show_default=True,
+    required=True,
 )
-def train(*args, **kwargs):
-    print("Not implemented yet!")
+def train(config, **kwargs):
+    config = Config(config)
+    print(config)
