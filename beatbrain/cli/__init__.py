@@ -1,6 +1,7 @@
 import click
 
-from . import convert
+from beatbrain.cli import convert
+from beatbrain.cli import model
 
 
 @click.group(invoke_without_command=True)
@@ -9,9 +10,9 @@ def main(ctx):
     # click.echo(click.style("BeatBrain", fg='bright_cyan', bold=True, underline=True))
     click.echo(
         click.style(
-            "=========================================================================\n"
+            "==============================================\n"
             "BeatBrain is distributed under the MIT License\n"
-            "=========================================================================\n",
+            "==============================================\n",
             fg="cyan",
         )
     )
@@ -20,3 +21,4 @@ def main(ctx):
 
 
 main.add_command(convert.convert)
+main.add_command(model.model)

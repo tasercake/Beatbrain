@@ -1,6 +1,8 @@
 import click
 
-from .. import settings, utils
+import beatbrain.utils.data
+from beatbrain import defaults
+from beatbrain.utils import core
 
 
 @click.group(invoke_without_command=True, short_help="Data Conversion Utilities")
@@ -27,50 +29,50 @@ def convert(ctx):
 @click.option(
     "--sr",
     help="Rate at which to resample audio",
-    default=settings.SAMPLE_RATE,
+    default=defaults.SAMPLE_RATE,
     show_default=True,
 )
 @click.option(
     "--offset",
     help="Audio start timestamp (seconds)",
-    default=settings.AUDIO_OFFSET,
+    default=defaults.AUDIO_OFFSET,
     show_default=True,
 )
 @click.option(
     "--duration",
     help="Audio duration (seconds)",
-    default=settings.AUDIO_DURATION,
+    default=defaults.AUDIO_DURATION,
     type=float,
     show_default=True,
 )
 @click.option(
     "--n_fft",
     help="Size of FFT window to use",
-    default=settings.N_FFT,
+    default=defaults.N_FFT,
     show_default=True,
 )
 @click.option(
     "--hop_length",
     help="Short-time Fourier Transform hop length",
-    default=settings.HOP_LENGTH,
+    default=defaults.HOP_LENGTH,
     show_default=True,
 )
 @click.option(
     "--n_mels",
     help="Number of frequency bins to use",
-    default=settings.N_MELS,
+    default=defaults.N_MELS,
     show_default=True,
 )
 @click.option(
     "--chunk_size",
     help="Number of frames per spectrogram chunk",
-    default=settings.CHUNK_SIZE,
+    default=defaults.CHUNK_SIZE,
     show_default=True,
 )
 @click.option(
     "--flip",
     help="Whether to flip images veritcally",
-    default=settings.IMAGE_FLIP,
+    default=defaults.IMAGE_FLIP,
     show_default=True,
 )
 @click.option(
@@ -86,7 +88,7 @@ def convert(ctx):
     show_default=True,
 )
 def to_numpy(path, output, **kwargs):
-    return utils.convert_to_numpy(path, output, **kwargs)
+    return beatbrain.utils.data.convert_to_numpy(path, output, **kwargs)
 
 
 @convert.command(name="image", short_help="Convert audio or .npz files to TIFF images")
@@ -95,38 +97,38 @@ def to_numpy(path, output, **kwargs):
 @click.option(
     "--sr",
     help="Rate at which to resample audio",
-    default=settings.SAMPLE_RATE,
+    default=defaults.SAMPLE_RATE,
     show_default=True,
 )
 @click.option(
     "--offset",
     help="Audio start timestamp (seconds)",
-    default=settings.AUDIO_OFFSET,
+    default=defaults.AUDIO_OFFSET,
     show_default=True,
 )
 @click.option(
     "--duration",
     help="Audio duration (seconds)",
-    default=settings.AUDIO_DURATION,
+    default=defaults.AUDIO_DURATION,
     type=float,
     show_default=True,
 )
 @click.option(
     "--n_fft",
     help="Size of FFT window to use",
-    default=settings.N_FFT,
+    default=defaults.N_FFT,
     show_default=True,
 )
 @click.option(
     "--hop_length",
     help="Short-time Fourier Transform hop length",
-    default=settings.HOP_LENGTH,
+    default=defaults.HOP_LENGTH,
     show_default=True,
 )
 @click.option(
     "--chunk_size",
     help="Number of frames per spectrogram chunk",
-    default=settings.CHUNK_SIZE,
+    default=defaults.CHUNK_SIZE,
     show_default=True,
 )
 @click.option(
@@ -138,7 +140,7 @@ def to_numpy(path, output, **kwargs):
 @click.option(
     "--flip",
     help="Whether to flip images veritcally",
-    default=settings.IMAGE_FLIP,
+    default=defaults.IMAGE_FLIP,
     show_default=True,
 )
 @click.option(
@@ -148,7 +150,7 @@ def to_numpy(path, output, **kwargs):
     show_default=True,
 )
 def to_image(path, output, **kwargs):
-    return utils.convert_to_image(path, output, **kwargs)
+    return beatbrain.utils.data.convert_to_image(path, output, **kwargs)
 
 
 @convert.command(
@@ -159,38 +161,38 @@ def to_image(path, output, **kwargs):
 @click.option(
     "--sr",
     help="Rate at which to resample audio",
-    default=settings.SAMPLE_RATE,
+    default=defaults.SAMPLE_RATE,
     show_default=True,
 )
 @click.option(
     "--n_fft",
     help="Size of FFT window to use",
-    default=settings.N_FFT,
+    default=defaults.N_FFT,
     show_default=True,
 )
 @click.option(
     "--hop_length",
     help="Short-time Fourier Transform hop length",
-    default=settings.HOP_LENGTH,
+    default=defaults.HOP_LENGTH,
     show_default=True,
 )
 @click.option(
     "--offset",
     help="Start point (in seconds) of reconstructed audio",
-    default=settings.AUDIO_OFFSET,
+    default=defaults.AUDIO_OFFSET,
     show_default=True,
 )
 @click.option(
     "--duration",
     help="Maximum seconds of audio to convert",
-    default=settings.AUDIO_DURATION,
+    default=defaults.AUDIO_DURATION,
     type=float,
     show_default=True,
 )
 @click.option(
     "--flip",
     help="Whether to flip images veritcally",
-    default=settings.IMAGE_FLIP,
+    default=defaults.IMAGE_FLIP,
     show_default=True,
 )
 @click.option(
@@ -200,4 +202,4 @@ def to_image(path, output, **kwargs):
     show_default=True,
 )
 def to_audio(path, output, **kwargs):
-    return utils.convert_to_audio(path, output, **kwargs)
+    return beatbrain.utils.data.convert_to_audio(path, output, **kwargs)
