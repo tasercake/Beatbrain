@@ -83,7 +83,9 @@ def show_spec(
         spec = scale_fn(spec, ref=np.max)
     kwargs["x_axis"] = "time" if labels else None
     kwargs["y_axis"] = ("mel" if mel else ("log" if log else "hz")) if labels else None
-    librosa.display.specshow(spec, cmap=cmap, sr=sr, hop_length=hop_length, vmin=-80, vmax=0, **kwargs)
+    librosa.display.specshow(
+        spec, cmap=cmap, sr=sr, hop_length=hop_length, vmin=-80, vmax=0, **kwargs
+    )
     if cbar:
         plt.colorbar(format="%+2.0f dB")
     plt.title(title)

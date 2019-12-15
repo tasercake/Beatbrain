@@ -21,12 +21,8 @@ def model(ctx):
 
 @model.command(name="train", short_help="Train a model")
 @click.option(
-    "-c",
-    "--config",
-    help="Config file that defines the model",
-    show_default=True,
-    required=True,
+    "-c", "--config", help="Config file that defines the model", show_default=True,
 )
 def train(config, **kwargs):
-    config = Config(config)
+    config = Config(config, add_defaults=True)
     print(config)

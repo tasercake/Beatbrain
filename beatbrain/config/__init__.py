@@ -1,22 +1,19 @@
 from pathlib import Path
 import yaml
-
-
-def load_yaml(path):
-    with Path(path).open("r") as file:
-        docs = yaml.load_all(file, Loader=yaml.Loader)
-        return {k: v for doc in docs for k, v in doc.items()}
+from pprint import pformat
 
 
 class Config(dict):
     DEFAULT_CONFIG_PATH = Path(__file__).parent.joinpath("default.yaml")
 
-    def __init__(self, data=None):
+    def __init__(self, data=None, add_defaults=False, default_config=None):
         data = data or {}
         super().__init__(data)
         for k, v in self.items():
             if isinstance(v, dict):
                 self[k] = Config(v)
+        if add_defaults:
+            self.add_defaults(default_config=default_config)
 
     def merge(self, override):
         """
@@ -45,18 +42,26 @@ class Config(dict):
         default_config.merge(self)
         self.update(default_config)
 
+    @staticmethod
+    def load_yaml(path):
+        with Path(path).open("r") as file:
+            docs = yaml.load_all(file, Loader=yaml.Loader)
+            return {k: v for doc in docs for k, v in doc.items()}
+
     @classmethod
     def from_yaml(cls, file):
         file = Path(file)
         if file.exists():
-            config = load_yaml(file)
+            config = cls.load_yaml(file)
             return cls(config)
         raise FileNotFoundError(file)
+
+    def __str__(self):
+        return pformat(self, indent=1, compact=True, width=120)
 
     __getattr__ = dict.__getitem__
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__
 
 
-default = Config()
-default.add_defaults()
+default = Config(add_defaults=True)

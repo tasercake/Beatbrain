@@ -1,15 +1,40 @@
 model:
+  architecture: cvae2d
   latent_dim: 4096
   module_repeat: 2
   use_inception: false
-data:
+  name: cvae2d
+---
+files:
   root: .
-  image_dims: [512, 640, 1]
-
-train:
-  batch_size: 1
-  epochs: 1000
-  learning_rate: 1e-4
+  train_dir: data/train
+  val_dir: data/val
+  test_dir: data/test
   log_dir: logs
   model_dir: models/
-  model_name: vae
+---
+train:
+  epochs: 100
+  test_fraction: 0.2
+  batch_size: 1
+  window_size: 1
+  learning_rate: 0.0001  # 1e-4
+  image_dims: [512, 640, 1]
+  channels_last: true
+  data_prefetch: 32
+  shuffle_buffer: 50000
+  data_parallel: false
+---
+spectrogram:
+  audio_duration: null
+  audio_offset: 0.0
+  sample_rate: 32768
+  resample_type: kaiser_fast
+  n_fft: 4096
+  hop_length: 256
+  n_mels: 512
+  n_frames: 640
+  truncate: true
+  image_flip: true
+  top_db: 80
+  audio_format: wav
