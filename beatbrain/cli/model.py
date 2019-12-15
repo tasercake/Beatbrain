@@ -2,7 +2,7 @@ import click
 
 import beatbrain.utils.data
 from beatbrain.config import Config
-from beatbrain import defaults
+from beatbrain import models
 
 
 @click.group(invoke_without_command=True, short_help="Model Utilities")
