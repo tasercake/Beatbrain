@@ -40,6 +40,7 @@ setuptools.setup(
     name="BeatBrain",
     version="0.0.1",
     author="Krishna Penukonda",
+    url="https://github.com/tasercake/beatbrain",
     long_description=long_description,
     packages=setuptools.find_packages(),
     classifiers=[

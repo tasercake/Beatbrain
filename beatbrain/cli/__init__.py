@@ -1,4 +1,5 @@
 import click
+import logging
 
 from beatbrain.cli import convert
 from beatbrain.cli import model

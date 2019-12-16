@@ -2,7 +2,10 @@ import click
 
 import beatbrain.utils.data
 from beatbrain import defaults
-from beatbrain.utils import core
+
+converter_options = [
+
+]
 
 
 @click.group(invoke_without_command=True, short_help="Data Conversion Utilities")
@@ -129,6 +132,12 @@ def to_numpy(path, output, **kwargs):
     "--chunk_size",
     help="Number of frames per spectrogram chunk",
     default=defaults.CHUNK_SIZE,
+    show_default=True,
+)
+@click.option(
+    "--n_mels",
+    help="Number of frequency bins to use",
+    default=defaults.N_MELS,
     show_default=True,
 )
 @click.option(
