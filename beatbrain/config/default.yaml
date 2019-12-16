@@ -24,6 +24,7 @@ train:
   data_prefetch: 32
   shuffle_buffer: 50000
   data_parallel: false
+  gpus: [0]
 ---
 spectrogram:
   audio_duration: null

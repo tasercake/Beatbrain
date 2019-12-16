@@ -2,12 +2,14 @@ import click
 
 import beatbrain.utils.data
 from beatbrain.config import Config
-from beatbrain import models
+from beatbrain import generator
+
+from pytorch_lightning import Trainer
 
 
 @click.group(invoke_without_command=True, short_help="Model Utilities")
 @click.pass_context
-def model(ctx):
+def models(ctx):
     click.echo(
         click.style(
             "----------------\n" "BeatBrain Models\n" "----------------\n",
@@ -19,10 +21,13 @@ def model(ctx):
         click.echo(ctx.get_help())
 
 
-@model.command(name="train", short_help="Train a model")
+@models.command(name="train", short_help="Train a model")
 @click.option(
     "-c", "--config", help="Config file that defines the model", show_default=True,
 )
 def train(config, **kwargs):
     config = Config(config, add_defaults=True)
     print(config)
+    model = generator.get_module(config.model.architecture)
+    trainer = Trainer()
+    trainer.fit(model)

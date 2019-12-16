@@ -2,7 +2,7 @@ import click
 import logging
 
 from beatbrain.cli import convert
-from beatbrain.cli import model
+from beatbrain.cli import models
 
 
 @click.group(invoke_without_command=True)
@@ -22,4 +22,4 @@ def main(ctx):
 
 
 main.add_command(convert.convert)
-main.add_command(model.model)
+main.add_command(models.models)
