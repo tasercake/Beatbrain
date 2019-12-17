@@ -36,6 +36,6 @@ spectrogram:
   n_mels: 512
   n_frames: 640
   truncate: true
-  image_flip: true
+  flip: true
   top_db: 80
   audio_format: wav
