@@ -1,9 +1,12 @@
-model:
-  architecture: cvae2d
-  latent_dim: 4096
-  module_repeat: 2
-  use_inception: false
-  name: cvae2d
+system:
+  architecture: CVAE2d
+  hyperparameters:
+    latent_dim: 4096
+    module_repeat: 2
+    use_inception: false
+    batch_size: 2
+    image_dims: [512, 640, 1]
+  name: CVAE2d
 ---
 files:
   root: .
@@ -15,22 +18,17 @@ files:
 ---
 train:
   epochs: 100
-  test_fraction: 0.2
-  batch_size: 1
-  window_size: 1
   learning_rate: 0.0001  # 1e-4
-  image_dims: [512, 640, 1]
-  channels_last: true
-  data_prefetch: 32
-  shuffle_buffer: 50000
-  data_parallel: false
   gpus: [0]
 ---
-spectrogram:
-  audio_duration: null
-  audio_offset: 0.0
+audio:
+  duration: null
+  offset: 0.0
   sample_rate: 32768
   resample_type: kaiser_fast
+  format: wav
+---
+spectrogram:
   n_fft: 4096
   hop_length: 256
   n_mels: 512
@@ -38,4 +36,3 @@ spectrogram:
   truncate: true
   flip: true
   top_db: 80
-  audio_format: wav

@@ -122,10 +122,10 @@ def get_audio_output_path(path, out_dir, inp, fmt):
 def load_dataset(
     path,
     flip=default.spectrogram.flip,
-    batch_size=default.train.batch_size,
-    shuffle_buffer=default.train.shuffle_buffer,
-    prefetch=default.train.data_prefetch,
-    parallel=default.train.data_parallel,
+    batch_size=default.system.hyperparameters.batch_size,
+    shuffle_buffer=50000,
+    prefetch=32,
+    parallel=True,
     subset=None,
 ):
     """
@@ -193,10 +193,10 @@ def load_dataset(
 def convert_audio_to_numpy(
     inp,
     out_dir,
-    sr=default.spectrogram.sample_rate,
-    offset=default.spectrogram.audio_offset,
-    duration=default.spectrogram.audio_duration,
-    res_type=default.spectrogram.resample_type,
+    sr=default.audio.sample_rate,
+    offset=default.audio.offset,
+    duration=default.audio.duration,
+    res_type=default.audio.resample_type,
     n_fft=default.spectrogram.n_fft,
     hop_length=default.spectrogram.hop_length,
     n_mels=default.spectrogram.n_mels,
@@ -250,10 +250,10 @@ def convert_image_to_numpy(inp, out_dir, flip=default.spectrogram.flip, skip=0):
 def convert_audio_to_image(
     inp,
     out_dir,
-    sr=default.spectrogram.sample_rate,
-    offset=default.spectrogram.audio_offset,
-    duration=default.spectrogram.audio_duration,
-    res_type=default.spectrogram.resample_type,
+    sr=default.audio.sample_rate,
+    offset=default.audio.offset,
+    duration=default.audio.duration,
+    res_type=default.audio.resample_type,
     n_fft=default.spectrogram.n_fft,
     hop_length=default.spectrogram.hop_length,
     n_mels=default.spectrogram.n_mels,
@@ -308,12 +308,12 @@ def convert_numpy_to_image(inp, out_dir, flip=default.spectrogram.flip, skip=0):
 def convert_numpy_to_audio(
     inp,
     out_dir,
-    sr=default.spectrogram.sample_rate,
+    sr=default.audio.sample_rate,
     n_fft=default.spectrogram.n_fft,
     hop_length=default.spectrogram.hop_length,
-    fmt=default.spectrogram.audio_format,
-    offset=default.spectrogram.audio_offset,
-    duration=default.spectrogram.audio_duration,
+    fmt=default.audio.format,
+    offset=default.audio.offset,
+    duration=default.audio.duration,
     skip=0,
 ):
     paths = get_paths(inp, directories=False)
@@ -334,12 +334,12 @@ def convert_numpy_to_audio(
 def convert_image_to_audio(
     inp,
     out_dir,
-    sr=default.spectrogram.sample_rate,
+    sr=default.audio.sample_rate,
     n_fft=default.spectrogram.n_fft,
     hop_length=default.spectrogram.hop_length,
-    fmt=default.spectrogram.audio_format,
-    offset=default.spectrogram.audio_offset,
-    duration=default.spectrogram.audio_duration,
+    fmt=default.audio.format,
+    offset=default.audio.offset,
+    duration=default.audio.duration,
     flip=default.spectrogram.flip,
     skip=0,
 ):

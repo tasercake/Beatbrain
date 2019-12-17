@@ -1,10 +1,13 @@
 import click
+import logging
+
+from pytorch_lightning import Trainer
 
 import beatbrain.utils.data
 from beatbrain.config import Config
 from beatbrain import generator
 
-from pytorch_lightning import Trainer
+logger = logging.getLogger(__name__)
 
 
 @click.group(invoke_without_command=True, short_help="Model Utilities")
@@ -12,7 +15,7 @@ from pytorch_lightning import Trainer
 def models(ctx):
     click.echo(
         click.style(
-            "----------------\n" "BeatBrain Models\n" "----------------\n",
+            "----------------\nBeatBrain Models\n----------------\n",
             fg="green",
             bold=True,
         )
@@ -27,7 +30,11 @@ def models(ctx):
 )
 def train(config, **kwargs):
     config = Config(config, add_defaults=True)
-    print(config)
-    model = generator.get_module(config.model.architecture)
-    trainer = Trainer()
+    logger.debug(f"Training config: {config}")
+    logger.info(click.style("Starting training...", fg="green"))
+    model = generator.get_module(config.system.architecture)(
+        **config.system.hyperparameters
+    )
+    trainer = Trainer(gpus=config.train.gpus)
     trainer.fit(model)
+    return model

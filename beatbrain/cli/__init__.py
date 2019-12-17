@@ -1,12 +1,17 @@
 import click
+import click_log
 import logging
 
 from beatbrain.cli import convert
 from beatbrain.cli import models
 
+logger = logging.getLogger(__name__)
+click_log.basic_config(logger)
+
 
 @click.group(invoke_without_command=True)
 @click.pass_context
+@click_log.simple_verbosity_option(logger)
 def main(ctx):
     # click.echo(click.style("BeatBrain", fg='bright_cyan', bold=True, underline=True))
     click.echo(
