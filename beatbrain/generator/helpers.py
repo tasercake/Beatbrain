@@ -1,7 +1,19 @@
 import numpy as np
 import tensorflow as tf
+import torch
 
 
+def reparameterize(mean, logvar, training=True):
+    if training:
+        std = torch.exp(0.5 * logvar)
+        eps = torch.randn_like(std)
+        return eps.mul(std).add_(mean)
+    else:
+        return mean
+
+
+# Old Tensorflow functions
+# TODO: Remove tensorflow functions
 def log_normal_pdf(sample, mean, logvar, raxis=1):
     log2pi = tf.math.log(2.0 * np.pi)
     return tf.reduce_sum(
@@ -20,11 +32,6 @@ def encode(encoder, x):
     inference = encoder(x)
     mean, logvar = tf.split(inference, num_or_size_splits=2, axis=1)
     return mean, logvar
-
-
-def reparameterize(mean, logvar):
-    eps = tf.random.normal(shape=mean.shape)
-    return eps * tf.exp(logvar * 0.5) + mean
 
 
 def decode(decoder, z, apply_sigmoid=False):

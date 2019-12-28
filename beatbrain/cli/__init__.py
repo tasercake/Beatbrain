@@ -1,27 +1,25 @@
-import click
-import click_log
+from pyfiglet import Figlet
 import logging
+import click
 
 from beatbrain.cli import convert
 from beatbrain.cli import models
 
 logger = logging.getLogger(__name__)
-click_log.basic_config(logger)
+logging.basicConfig()
 
 
 @click.group(invoke_without_command=True)
 @click.pass_context
-@click_log.simple_verbosity_option(logger)
 def main(ctx):
-    # click.echo(click.style("BeatBrain", fg='bright_cyan', bold=True, underline=True))
-    click.echo(
-        click.style(
-            "==============================================\n"
-            "BeatBrain is distributed under the MIT License\n"
-            "==============================================\n",
-            fg="cyan",
-        )
-    )
+    f = Figlet(font="slant")
+    click.echo(click.style(f.renderText("BeatBrain"), fg="bright_blue", bold=True))
+    # click.echo(
+    #     click.style(
+    #         "BeatBrain is distributed under the MIT License\n",
+    #         fg="cyan",
+    #     )
+    # )
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
 

@@ -6,8 +6,10 @@ import pytorch_lightning as pl
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
 
+from beatbrain.generator import helpers
 
-class CVAE2d(pl.LightningModule):
+
+class Conv2dAutoencoder(pl.LightningModule):
     def __init__(self, **kwargs):
         super().__init__()
         self.__dict__.update(kwargs)  # TODO: check if this is safe
@@ -31,13 +33,10 @@ class CVAE2d(pl.LightningModule):
         x, _ = batch
         pred = self.forward(x)
         loss = F.mse_loss(pred, x)
-        return {"loss": loss}
-
-    def train_dataloader(self):
-        pass
+        return {"loss": loss, "val_loss": loss}
 
     def configure_optimizers(self):
-        return [torch.optim.Adam(self.parameters(), lr=0.02)]
+        return [torch.optim.Adam(self.parameters(), lr=self.learning_rate)]
 
     @pl.data_loader
     def train_dataloader(self):
@@ -50,3 +49,7 @@ class CVAE2d(pl.LightningModule):
             ),
             batch_size=self.batch_size,
         )
+
+    @pl.data_loader
+    def val_dataloader(self):
+        pass

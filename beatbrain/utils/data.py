@@ -121,7 +121,7 @@ def get_audio_output_path(path, out_dir, inp, fmt):
 
 def load_dataset(
     path,
-    flip=default.spectrogram.flip,
+    flip=default.spec.flip,
     batch_size=default.system.hyperparameters.batch_size,
     shuffle_buffer=50000,
     prefetch=32,
@@ -197,11 +197,11 @@ def convert_audio_to_numpy(
     offset=default.audio.offset,
     duration=default.audio.duration,
     res_type=default.audio.resample_type,
-    n_fft=default.spectrogram.n_fft,
-    hop_length=default.spectrogram.hop_length,
-    n_mels=default.spectrogram.n_mels,
-    chunk_size=default.spectrogram.n_frames,
-    truncate=default.spectrogram.truncate,
+    n_fft=default.spec.n_fft,
+    hop_length=default.spec.hop_length,
+    n_mels=default.spec.n_mels,
+    chunk_size=default.spec.n_frames,
+    truncate=default.spec.truncate,
     skip=0,
 ):
     paths = get_paths(inp, directories=False)
@@ -234,7 +234,7 @@ def convert_audio_to_numpy(
         save_arrays(chunks, output)
 
 
-def convert_image_to_numpy(inp, out_dir, flip=default.spectrogram.flip, skip=0):
+def convert_image_to_numpy(inp, out_dir, flip=default.spec.flip, skip=0):
     paths = get_paths(inp, directories=True)
     print(f"Converting files in {Fore.YELLOW}'{inp}'{Fore.RESET} to Numpy arrays...")
     print(f"Arrays will be saved in {Fore.YELLOW}'{out_dir}'{Fore.RESET}\n")
@@ -254,12 +254,12 @@ def convert_audio_to_image(
     offset=default.audio.offset,
     duration=default.audio.duration,
     res_type=default.audio.resample_type,
-    n_fft=default.spectrogram.n_fft,
-    hop_length=default.spectrogram.hop_length,
-    n_mels=default.spectrogram.n_mels,
-    chunk_size=default.spectrogram.n_frames,
-    truncate=default.spectrogram.truncate,
-    flip=default.spectrogram.flip,
+    n_fft=default.spec.n_fft,
+    hop_length=default.spec.hop_length,
+    n_mels=default.spec.n_mels,
+    chunk_size=default.spec.n_frames,
+    truncate=default.spec.truncate,
+    flip=default.spec.flip,
     skip=0,
 ):
     paths = get_paths(inp, directories=False)
@@ -292,7 +292,7 @@ def convert_audio_to_image(
         save_images(chunks, output, flip=flip)
 
 
-def convert_numpy_to_image(inp, out_dir, flip=default.spectrogram.flip, skip=0):
+def convert_numpy_to_image(inp, out_dir, flip=default.spec.flip, skip=0):
     paths = get_paths(inp, directories=False)
     print(f"Converting files in {Fore.YELLOW}'{inp}'{Fore.RESET} to images...")
     print(f"Images will be saved in {Fore.YELLOW}'{out_dir}'{Fore.RESET}\n")
@@ -309,8 +309,8 @@ def convert_numpy_to_audio(
     inp,
     out_dir,
     sr=default.audio.sample_rate,
-    n_fft=default.spectrogram.n_fft,
-    hop_length=default.spectrogram.hop_length,
+    n_fft=default.spec.n_fft,
+    hop_length=default.spec.hop_length,
     fmt=default.audio.format,
     offset=default.audio.offset,
     duration=default.audio.duration,
@@ -335,12 +335,12 @@ def convert_image_to_audio(
     inp,
     out_dir,
     sr=default.audio.sample_rate,
-    n_fft=default.spectrogram.n_fft,
-    hop_length=default.spectrogram.hop_length,
+    n_fft=default.spec.n_fft,
+    hop_length=default.spec.hop_length,
     fmt=default.audio.format,
     offset=default.audio.offset,
     duration=default.audio.duration,
-    flip=default.spectrogram.flip,
+    flip=default.spec.flip,
     skip=0,
 ):
     paths = get_paths(inp, directories=True)

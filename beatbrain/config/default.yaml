@@ -1,11 +1,12 @@
 system:
-  architecture: CVAE2d
+  architecture: Conv2dAutoencoder
   hyperparameters:
     latent_dim: 4096
     module_repeat: 2
     use_inception: false
     batch_size: 2
     image_dims: [512, 640, 1]
+    learning_rate: 0.0001  # 1e-4
   name: CVAE2d
 ---
 files:
@@ -18,7 +19,6 @@ files:
 ---
 train:
   epochs: 100
-  learning_rate: 0.0001  # 1e-4
   gpus: [0]
 ---
 audio:
@@ -28,7 +28,7 @@ audio:
   resample_type: kaiser_fast
   format: wav
 ---
-spectrogram:
+spec:
   n_fft: 4096
   hop_length: 256
   n_mels: 512

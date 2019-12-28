@@ -1,3 +1,4 @@
+from pyfiglet import Figlet
 import click
 import logging
 
@@ -8,18 +9,14 @@ from beatbrain.config import Config
 from beatbrain import generator
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 @click.group(invoke_without_command=True, short_help="Model Utilities")
 @click.pass_context
 def models(ctx):
-    click.echo(
-        click.style(
-            "----------------\nBeatBrain Models\n----------------\n",
-            fg="green",
-            bold=True,
-        )
-    )
+    f = Figlet(font="big")
+    click.echo(click.style(f.renderText("/ models"), fg="bright_blue", bold=True,))
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
 
@@ -30,8 +27,8 @@ def models(ctx):
 )
 def train(config, **kwargs):
     config = Config(config, add_defaults=True)
-    logger.debug(f"Training config: {config}")
-    logger.info(click.style("Starting training...", fg="green"))
+    logger.info(f"Training config: {config}")
+    logger.info(click.style("Starting training...", fg="bright_green"))
     model = generator.get_module(config.system.architecture)(
         **config.system.hyperparameters
     )
