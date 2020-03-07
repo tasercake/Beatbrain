@@ -22,6 +22,8 @@ requirements = [
     "python-dotenv",
     "requests",
     "mutagen",
+    "pyfiglet",
+    "pytorch-lightning",
 ]
 
 dev_requirements = [
@@ -37,8 +39,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="BeatBrain",
-    version="0.0.1",
+    name="beatbrain",
+    version="0.0.2",
     author="Krishna Penukonda",
     url="https://github.com/tasercake/beatbrain",
     long_description=long_description,

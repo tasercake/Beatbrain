@@ -1,12 +1,12 @@
 system:
-  architecture: Conv2dAutoencoder
+  architecture: mnist/MNISTAutoEncoder
   hyperparameters:
     latent_dim: 4096
     module_repeat: 2
     use_inception: false
     batch_size: 2
     image_dims: [512, 640, 1]
-    learning_rate: 0.0001  # 1e-4
+    learning_rate: 0.0001
   name: CVAE2d
 ---
 files:

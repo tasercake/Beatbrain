@@ -1,5 +1,4 @@
 import numpy as np
-import tensorflow as tf
 import torch
 
 
@@ -12,31 +11,29 @@ def reparameterize(mean, logvar, training=True):
         return mean
 
 
-# Old Tensorflow functions
-# TODO: Remove tensorflow functions
 def log_normal_pdf(sample, mean, logvar, raxis=1):
-    log2pi = tf.math.log(2.0 * np.pi)
-    return tf.reduce_sum(
-        -0.5 * ((sample - mean) ** 2.0 * tf.exp(-logvar) + logvar + log2pi), axis=raxis
+    log2pi = torch.log(2.0 * np.pi)
+    return torch.sum(
+        -0.5 * ((sample - mean) ** 2.0 * torch.exp(-logvar) + logvar + log2pi),
+        dim=raxis,
     )
 
 
-@tf.function
 def sample(latent_dim, decoder, eps=None):
     if eps is None:
-        eps = tf.random.normal(shape=(100, latent_dim))
+        eps = torch.normal(0, 1, (100, latent_dim))
     return decode(decoder, eps, apply_sigmoid=True)
 
 
 def encode(encoder, x):
     inference = encoder(x)
-    mean, logvar = tf.split(inference, num_or_size_splits=2, axis=1)
+    mean, logvar = torch.split(inference, 2, dim=1)
     return mean, logvar
 
 
 def decode(decoder, z, apply_sigmoid=False):
     logits = decoder(z)
     if apply_sigmoid:
-        probs = tf.sigmoid(logits)
+        probs = torch.sigmoid(logits)
         return probs
     return logits
