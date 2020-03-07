@@ -1,38 +1,36 @@
-system:
+model:
+  name: mnist_cae
   architecture: mnist/MNISTAutoEncoder
-  hyperparameters:
-    latent_dim: 4096
-    module_repeat: 2
-    use_inception: false
-    batch_size: 2
-    image_dims: [512, 640, 1]
-    learning_rate: 0.0001
-  name: CVAE2d
+  options:
+    hyperparameters:
+      batch_size: 32
+      learning_rate: 0.0001
+      latent_dim: 32
+      # image_dims: [512, 640, 1]  # Get this from `spec` instead
+    data:
+      files:
+        train: data/mnist/train/
+        val: data/mnist/val/
+        test: data/mnist/test/
+      audio:
+        duration: null
+        offset: 0.0
+        sample_rate: 32768
+        resample_type: kaiser_fast
+        format: wav
+      spec:
+        n_fft: 4096
+        hop_length: 256
+        n_mels: 512
+        n_frames: 640
+        truncate: true
+        flip: true
+        top_db: 80
 ---
-files:
-  root: .
-  train_dir: data/train
-  val_dir: data/val
-  test_dir: data/test
-  log_dir: logs
-  model_dir: models/
----
-train:
-  epochs: 100
+trainer:
+  max_epochs: 100
   gpus: [0]
----
-audio:
-  duration: null
-  offset: 0.0
-  sample_rate: 32768
-  resample_type: kaiser_fast
-  format: wav
----
-spec:
-  n_fft: 4096
-  hop_length: 256
-  n_mels: 512
-  n_frames: 640
-  truncate: true
-  flip: true
-  top_db: 80
+  default_save_path: beatbrain_experiments/
+  # files:
+  #   log_dir: logs/
+  #   model_dir: models/

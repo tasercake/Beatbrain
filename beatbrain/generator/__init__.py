@@ -6,15 +6,14 @@ import torch
 from . import models, helpers, metrics
 
 logger = logging.getLogger(__name__)
-# MODULES = (mnist,)  # Must be a hashable container
 
 
 @lru_cache()
 def discover_models():
-    modules = dict(filter(lambda e: ismodule(e[1]), models.__dict__.items()))
+    modules = dict(filter(lambda e: ismodule(e[1]), vars(models).items()))
     _models = {}
     for module_name, module in modules.items():
-        for obj_name, obj in module.__dict__.items():
+        for obj_name, obj in vars(module).items():
             if isclass(obj) and issubclass(obj, torch.nn.Module):
                 _models[f"{module_name}/{obj_name}"] = obj
     logger.info(f"Discovered {len(_models)} models: {list(_models.keys())}")

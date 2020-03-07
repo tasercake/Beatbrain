@@ -29,9 +29,9 @@ def train(config, **kwargs):
     config = Config(config, add_defaults=True)
     logger.info(f"Training config: {config}")
     logger.info(click.style("Starting training...", fg="bright_green"))
-    model = generator.get_model(config.system.architecture)(
-        **config.system.hyperparameters
+    model = generator.get_model(config.model.architecture)(
+        **config.model.options  # TODO: maybe don't unpack?
     )
-    trainer = Trainer(gpus=config.train.gpus)
+    trainer = Trainer(**config.trainer)
     trainer.fit(model)
     return model
