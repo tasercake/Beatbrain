@@ -5,7 +5,6 @@ import seaborn as sns
 import tensorflow as tf
 from tensorflow.keras.callbacks import Callback
 
-from beatbrain import display
 from beatbrain import utils
 
 
@@ -61,14 +60,14 @@ class VisualizeCallback(Callback):
         for i, sample in enumerate(self.samples):
             fig.add_subplot(121)
             sample = sample[None, :]
-            display.show_spec(
+            utils.display.show_spec(
                 utils.denormalize_spectrogram(sample[0, ..., 0].numpy()),
                 title="Original",
                 cmap=self.cmap,
             )
             fig.add_subplot(122)
             reconstructed = self.model(sample)
-            display.show_spec(
+            utils.display.show_spec(
                 utils.denormalize_spectrogram(reconstructed[0, ..., 0].numpy()),
                 title="Reconstructed",
                 cmap=self.cmap,
@@ -103,7 +102,7 @@ class VisualizeCallback(Callback):
         for i, gen in enumerate(generated):
             gen = gen[None, :]
             title = f"gen_{i + 1}@{'epoch' if epoch else 'batch'}_{epoch or batch}"
-            display.show_spec(
+            utils.display.show_spec(
                 utils.denormalize_spectrogram(gen[0, ..., 0].numpy()),
                 title=title,
                 cmap=self.cmap,
