@@ -24,6 +24,8 @@ requirements = [
     "mutagen",
     "pyfiglet",
     "pytorch-lightning",
+    "test-tube",
+    "torchsummary",
 ]
 
 dev_requirements = [

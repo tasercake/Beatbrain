@@ -234,7 +234,9 @@ def convert_audio_to_numpy(
         save_arrays(chunks, output)
 
 
-def convert_image_to_numpy(inp, out_dir, flip=default.model.options.data.spec.flip, skip=0):
+def convert_image_to_numpy(
+    inp, out_dir, flip=default.model.options.data.spec.flip, skip=0
+):
     paths = get_paths(inp, directories=True)
     print(f"Converting files in {Fore.YELLOW}'{inp}'{Fore.RESET} to Numpy arrays...")
     print(f"Arrays will be saved in {Fore.YELLOW}'{out_dir}'{Fore.RESET}\n")
@@ -292,7 +294,9 @@ def convert_audio_to_image(
         save_images(chunks, output, flip=flip)
 
 
-def convert_numpy_to_image(inp, out_dir, flip=default.model.options.data.spec.flip, skip=0):
+def convert_numpy_to_image(
+    inp, out_dir, flip=default.model.options.data.spec.flip, skip=0
+):
     paths = get_paths(inp, directories=False)
     print(f"Converting files in {Fore.YELLOW}'{inp}'{Fore.RESET} to images...")
     print(f"Images will be saved in {Fore.YELLOW}'{out_dir}'{Fore.RESET}\n")

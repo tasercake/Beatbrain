@@ -24,7 +24,9 @@ def get_model(architecture):
     try:
         _models = discover_models()
     except:
-        logger.exception("Model discovery failed. This is probably the developer's fault. Please report this by creating a github issue.")
+        logger.exception(
+            "Model discovery failed. This is probably the developer's fault. Please report this by creating a github issue."
+        )
         raise
     if isinstance(architecture, str):
         try:

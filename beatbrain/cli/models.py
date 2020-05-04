@@ -2,6 +2,7 @@ from pyfiglet import Figlet
 import click
 import logging
 
+import pytorch_lightning as pl
 from pytorch_lightning import Trainer
 
 import beatbrain.utils.data
@@ -32,6 +33,9 @@ def train(config, **kwargs):
     model = generator.get_model(config.model.architecture)(
         **config.model.options  # TODO: maybe don't unpack?
     )
-    trainer = Trainer(**config.trainer)
+    pl_loggers = [getattr(pl.loggers, l)(**config.loggers[l]) for l in config.loggers]
+    if len(pl_loggers) == 1:
+        pl_loggers = pl_loggers[0]
+    trainer = Trainer(**config.trainer, logger=pl_loggers)
     trainer.fit(model)
     return model

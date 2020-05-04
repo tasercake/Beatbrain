@@ -8,6 +8,8 @@ class Config(dict):
 
     def __init__(self, data=None, add_defaults=False, default_config=None):
         data = data or {}
+        if isinstance(data, (str, Path)):
+            data = self.from_yaml(data)
         super().__init__(data)
         for k, v in self.items():
             if isinstance(v, dict):
