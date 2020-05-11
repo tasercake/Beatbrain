@@ -26,14 +26,14 @@ requirements = [
     "pytorch-lightning",
     "test-tube",
     "torchsummary",
+    "nnAudio",
+    "addict",
+    "numba==0.48.0",
+    "cached-property",
 ]
 
 dev_requirements = [
     "black",
-    "nb_black",
-    "parametrized",
-    "pytest",
-    "pre-commit",
     "jupyter",
 ]
 
@@ -42,7 +42,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="beatbrain",
-    version="0.0.2",
+    version="1.0.0",
     author="Krishna Penukonda",
     url="https://github.com/tasercake/beatbrain",
     long_description=long_description,

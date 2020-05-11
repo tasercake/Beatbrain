@@ -1,7 +1,7 @@
 import click
 
-import beatbrain.utils.data
-from beatbrain import defaults
+from ..utils import data as data_utils
+from ..utils.config import default_config
 
 
 @click.group(invoke_without_command=True, short_help="Data Conversion Utilities")
@@ -33,50 +33,50 @@ _converter_options = [
     click.option(
         "--sr",
         help="Rate at which to resample audio",
-        default=defaults.SAMPLE_RATE,
+        default=default_config.SAMPLE_RATE,
         show_default=True,
     ),
     click.option(
         "--offset",
         help="Audio start timestamp (seconds)",
-        default=defaults.AUDIO_OFFSET,
+        default=default_config.AUDIO_OFFSET,
         show_default=True,
     ),
     click.option(
         "--duration",
         help="Audio duration (seconds)",
-        default=defaults.AUDIO_DURATION,
+        default=default_config.AUDIO_DURATION,
         type=float,
         show_default=True,
     ),
     click.option(
         "--n_fft",
         help="Size of FFT window to use",
-        default=defaults.N_FFT,
+        default=default_config.N_FFT,
         show_default=True,
     ),
     click.option(
         "--hop_length",
         help="Short-time Fourier Transform hop length",
-        default=defaults.HOP_LENGTH,
+        default=default_config.HOP_LENGTH,
         show_default=True,
     ),
     click.option(
         "--n_mels",
         help="Number of frequency bins to use",
-        default=defaults.N_MELS,
+        default=default_config.N_MELS,
         show_default=True,
     ),
     click.option(
         "--chunk_size",
         help="Number of frames per spectrogram chunk",
-        default=defaults.CHUNK_SIZE,
+        default=default_config.CHUNK_SIZE,
         show_default=True,
     ),
     click.option(
         "--flip",
         help="Whether to flip images veritcally",
-        default=defaults.IMAGE_FLIP,
+        default=default_config.IMAGE_FLIP,
         show_default=True,
     ),
     click.option(
@@ -107,7 +107,7 @@ def converter_options(func):
 )
 @converter_options
 def to_numpy(path, output, **kwargs):
-    return beatbrain.utils.data.convert_to_numpy(path, output, **kwargs)
+    return data_utils.convert_to_numpy(path, output, **kwargs)
 
 
 @convert.command(
@@ -119,11 +119,11 @@ def to_numpy(path, output, **kwargs):
 @click.option(
     "--flip",
     help="Whether to flip images vertically",
-    default=defaults.IMAGE_FLIP,
+    default=default_config.IMAGE_FLIP,
     show_default=True,
 )
 def to_image(path, output, **kwargs):
-    return beatbrain.utils.data.convert_to_image(path, output, **kwargs)
+    return data_utils.convert_to_image(path, output, **kwargs)
 
 
 @convert.command(
@@ -136,38 +136,38 @@ def to_image(path, output, **kwargs):
 @click.option(
     "--sr",
     help="Rate at which to resample audio",
-    default=defaults.SAMPLE_RATE,
+    default=default_config.SAMPLE_RATE,
     show_default=True,
 )
 @click.option(
     "--n_fft",
     help="Size of FFT window to use",
-    default=defaults.N_FFT,
+    default=default_config.N_FFT,
     show_default=True,
 )
 @click.option(
     "--hop_length",
     help="Short-time Fourier Transform hop length",
-    default=defaults.HOP_LENGTH,
+    default=default_config.HOP_LENGTH,
     show_default=True,
 )
 @click.option(
     "--offset",
     help="Start point (in seconds) of reconstructed audio",
-    default=defaults.AUDIO_OFFSET,
+    default=default_config.AUDIO_OFFSET,
     show_default=True,
 )
 @click.option(
     "--duration",
     help="Maximum seconds of audio to convert",
-    default=defaults.AUDIO_DURATION,
+    default=default_config.AUDIO_DURATION,
     type=float,
     show_default=True,
 )
 @click.option(
     "--flip",
     help="Whether to flip images veritcally",
-    default=defaults.IMAGE_FLIP,
+    default=default_config.IMAGE_FLIP,
     show_default=True,
 )
 @click.option(
@@ -177,4 +177,4 @@ def to_image(path, output, **kwargs):
     show_default=True,
 )
 def to_audio(path, output, **kwargs):
-    return beatbrain.utils.data.convert_to_audio(path, output, **kwargs)
+    return data_utils.convert_to_audio(path, output, **kwargs)

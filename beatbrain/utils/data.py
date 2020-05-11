@@ -1,15 +1,14 @@
 import librosa
 import soundfile as sf
-import tensorflow as tf
 from tqdm import tqdm
 from pathlib import Path
 from colorama import Fore
 from natsort import natsorted
 from audioread import DecodeError
 
-from beatbrain.config import Config, default
-from beatbrain.utils.misc import DataType, EXTENSIONS
-from beatbrain.utils.core import (
+from .config import Config, default_config
+from .misc import DataType, EXTENSIONS
+from .core import (
     save_images,
     load_image,
     load_images,
@@ -121,8 +120,8 @@ def get_audio_output_path(path, out_dir, inp, fmt):
 
 def load_dataset(
     path,
-    flip=default.model.options.data.spec.flip,
-    batch_size=default.model.options.hyperparameters.batch_size,
+    flip=default_config.hparams.spec.flip,
+    batch_size=default_config.hparams.batch_size,
     shuffle_buffer=50000,
     prefetch=32,
     parallel=True,
@@ -193,15 +192,15 @@ def load_dataset(
 def convert_audio_to_numpy(
     inp,
     out_dir,
-    sr=default.model.options.data.audio.sample_rate,
-    offset=default.model.options.data.audio.offset,
-    duration=default.model.options.data.audio.duration,
-    res_type=default.model.options.data.audio.resample_type,
-    n_fft=default.model.options.data.spec.n_fft,
-    hop_length=default.model.options.data.spec.hop_length,
-    n_mels=default.model.options.data.spec.n_mels,
-    chunk_size=default.model.options.data.spec.n_frames,
-    truncate=default.model.options.data.spec.truncate,
+    sr=default_config.hparams.audio.sample_rate,
+    offset=default_config.hparams.audio.offset,
+    duration=default_config.hparams.audio.duration,
+    res_type=default_config.hparams.audio.resample_type,
+    n_fft=default_config.hparams.spec.n_fft,
+    hop_length=default_config.hparams.spec.hop_length,
+    n_mels=default_config.hparams.spec.n_mels,
+    chunk_size=default_config.hparams.spec.n_frames,
+    truncate=default_config.hparams.spec.truncate,
     skip=0,
 ):
     paths = get_paths(inp, directories=False)
@@ -234,9 +233,7 @@ def convert_audio_to_numpy(
         save_arrays(chunks, output)
 
 
-def convert_image_to_numpy(
-    inp, out_dir, flip=default.model.options.data.spec.flip, skip=0
-):
+def convert_image_to_numpy(inp, out_dir, flip=default_config.spec.flip, skip=0):
     paths = get_paths(inp, directories=True)
     print(f"Converting files in {Fore.YELLOW}'{inp}'{Fore.RESET} to Numpy arrays...")
     print(f"Arrays will be saved in {Fore.YELLOW}'{out_dir}'{Fore.RESET}\n")
@@ -252,16 +249,16 @@ def convert_image_to_numpy(
 def convert_audio_to_image(
     inp,
     out_dir,
-    sr=default.model.options.data.audio.sample_rate,
-    offset=default.model.options.data.audio.offset,
-    duration=default.model.options.data.audio.duration,
-    res_type=default.model.options.data.audio.resample_type,
-    n_fft=default.model.options.data.spec.n_fft,
-    hop_length=default.model.options.data.spec.hop_length,
-    n_mels=default.model.options.data.spec.n_mels,
-    chunk_size=default.model.options.data.spec.n_frames,
-    truncate=default.model.options.data.spec.truncate,
-    flip=default.model.options.data.spec.flip,
+    sr=default_config.hparams.audio.sample_rate,
+    offset=default_config.hparams.audio.offset,
+    duration=default_config.hparams.audio.duration,
+    res_type=default_config.hparams.audio.resample_type,
+    n_fft=default_config.hparams.spec.n_fft,
+    hop_length=default_config.spec.hop_length,
+    n_mels=default_config.hparams.spec.n_mels,
+    chunk_size=default_config.hparams.spec.n_frames,
+    truncate=default_config.hparams.spec.truncate,
+    flip=default_config.hparams.spec.flip,
     skip=0,
 ):
     paths = get_paths(inp, directories=False)
@@ -294,9 +291,7 @@ def convert_audio_to_image(
         save_images(chunks, output, flip=flip)
 
 
-def convert_numpy_to_image(
-    inp, out_dir, flip=default.model.options.data.spec.flip, skip=0
-):
+def convert_numpy_to_image(inp, out_dir, flip=default_config.hparams.spec.flip, skip=0):
     paths = get_paths(inp, directories=False)
     print(f"Converting files in {Fore.YELLOW}'{inp}'{Fore.RESET} to images...")
     print(f"Images will be saved in {Fore.YELLOW}'{out_dir}'{Fore.RESET}\n")
@@ -312,12 +307,12 @@ def convert_numpy_to_image(
 def convert_numpy_to_audio(
     inp,
     out_dir,
-    sr=default.model.options.data.audio.sample_rate,
-    n_fft=default.model.options.data.spec.n_fft,
-    hop_length=default.model.options.data.spec.hop_length,
-    fmt=default.model.options.data.audio.format,
-    offset=default.model.options.data.audio.offset,
-    duration=default.model.options.data.audio.duration,
+    sr=default_config.hparams.audio.sample_rate,
+    n_fft=default_config.hparams.spec.n_fft,
+    hop_length=default_config.hparams.spec.hop_length,
+    fmt=default_config.hparams.audio.format,
+    offset=default_config.hparams.audio.offset,
+    duration=default_config.hparams.audio.duration,
     skip=0,
 ):
     paths = get_paths(inp, directories=False)
@@ -338,13 +333,13 @@ def convert_numpy_to_audio(
 def convert_image_to_audio(
     inp,
     out_dir,
-    sr=default.model.options.data.audio.sample_rate,
-    n_fft=default.model.options.data.spec.n_fft,
-    hop_length=default.model.options.data.spec.hop_length,
-    fmt=default.model.options.data.audio.format,
-    offset=default.model.options.data.audio.offset,
-    duration=default.model.options.data.audio.duration,
-    flip=default.model.options.data.spec.flip,
+    sr=default_config.hparams.audio.sample_rate,
+    n_fft=default_config.hparams.spec.n_fft,
+    hop_length=default_config.hparams.spec.hop_length,
+    fmt=default_config.hparams.audio.format,
+    offset=default_config.hparams.audio.offset,
+    duration=default_config.hparams.audio.duration,
+    flip=default_config.hparams.spec.flip,
     skip=0,
 ):
     paths = get_paths(inp, directories=True)
