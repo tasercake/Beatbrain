@@ -229,3 +229,7 @@ dmypy.json
 # Data, Models, and Logs
 data
 logs/
+beatbrain_experiments/
+experiments/
+
+notebooks/models/

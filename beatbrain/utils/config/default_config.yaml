@@ -1,0 +1,32 @@
+model:
+  name: mnist
+  architecture: MNISTAutoencoder
+  weights_path: null
+hparams:
+  data_root: data/fashion_mnist/
+  batch_size: 32
+  learning_rate: 0.0001
+  latent_dim: 3
+  # image_dims: [512, 640, 1]  # Get this from `spec` instead
+  audio:
+    duration: null
+    offset: 0.0
+    sample_rate: 32768
+    resample_type: kaiser_fast
+    format: wav
+  spec:
+    n_fft: 4096
+    hop_length: 256
+    n_mels: 512
+    n_frames: 640
+    truncate: true
+    flip: true
+    top_db: 80
+trainer:
+  gpus: [0]
+  max_epochs: 200
+  progress_bar_refresh_rate: 1
+  logger:
+    TestTubeLogger:
+      save_dir: experiments/
+      name: fashion_mnist

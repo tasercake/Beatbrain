@@ -22,14 +22,19 @@ requirements = [
     "python-dotenv",
     "requests",
     "mutagen",
+    "pyfiglet",
+    "pytorch-lightning",
+    "test-tube",
+    "torchsummary",
+    "nnAudio",
+    "addict",
+    "numba==0.48.0",
+    "cached-property",
+    "more_itertools",
 ]
 
 dev_requirements = [
     "black",
-    "nb_black",
-    "parametrized",
-    "pytest",
-    "pre-commit",
     "jupyter",
 ]
 
@@ -37,9 +42,10 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="BeatBrain",
-    version="0.0.1",
+    name="beatbrain",
+    version="1.0.0",
     author="Krishna Penukonda",
+    url="https://github.com/tasercake/beatbrain",
     long_description=long_description,
     packages=setuptools.find_packages(),
     classifiers=[

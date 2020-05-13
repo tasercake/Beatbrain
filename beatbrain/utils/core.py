@@ -5,8 +5,8 @@ import imageio
 import numpy as np
 from natsort import natsorted
 
-from beatbrain import defaults
-from beatbrain.utils.misc import DataType, EXTENSIONS
+from .config import default_config
+from .misc import DataType, EXTENSIONS
 
 
 def split_spectrogram(spec, chunk_size, truncate=True, axis=1):
@@ -110,7 +110,7 @@ def spectrogram_to_audio(spec, denormalize=False, norm_kwargs=None, **kwargs):
 
 # TODO: Remove dependency on settings.TOP_DB
 def normalize_spectrogram(
-    spec, scale_fn=None, top_db=defaults.TOP_DB, ref=np.max, **kwargs
+    spec, scale_fn=None, top_db=default_config.hparams.spec.top_db, ref=np.max, **kwargs
 ):
     """
     Log and normalize a mel spectrogram using `librosa.power_to_db()`
@@ -120,7 +120,7 @@ def normalize_spectrogram(
 
 
 def denormalize_spectrogram(
-    spec, scale_fn=None, top_db=defaults.TOP_DB, ref=32768, **kwargs
+    spec, scale_fn=None, top_db=default_config.hparams.spec.top_db, ref=32768, **kwargs
 ):
     """
     Exp and denormalize a mel spectrogram using `librosa.db_to_power()`
