@@ -10,7 +10,7 @@ from tqdm import tqdm
 from PIL import Image
 
 from beatbrain.generator import data_utils
-from beatbrain import defaults
+from beatbrain import default_config
 
 tf.compat.v1.enable_eager_execution()
 
@@ -49,7 +49,9 @@ def visualize_model_outputs(mdl, epoch, test_input, output):
     print(f"Saving Samples Images to {output}")
     for i, pred in enumerate(predictions):
         progress_dir = (
-            Path(defaults.MODEL_WEIGHTS or datetime.now().strftime("%Y%m%d-%H%M%S"))
+            Path(
+                default_config.MODEL_WEIGHTS or datetime.now().strftime("%Y%m%d-%H%M%S")
+            )
             .resolve()
             .stem
         )
@@ -81,10 +83,10 @@ def vae_loss(mean, logvar, img_dims):
 
 
 # region Model hyperparameters
-window_size = defaults.WINDOW_SIZE
-image_dims = [defaults.CHUNK_SIZE, defaults.N_MELS]
+window_size = default_config.WINDOW_SIZE
+image_dims = [default_config.CHUNK_SIZE, default_config.N_MELS]
 input_shape = [*image_dims, window_size]
-latent_dims = defaults.LATENT_DIMS
+latent_dims = default_config.LATENT_DIMS
 num_conv = 2
 num_filters = 32
 max_filters = 64
@@ -92,8 +94,8 @@ kernel_size = 3
 # endregion
 
 # region Training hyperparameters
-num_epochs = defaults.EPOCHS
-batch_size = defaults.BATCH_SIZE
+num_epochs = default_config.EPOCHS
+batch_size = default_config.BATCH_SIZE
 # endregion
 
 # region Model definition
@@ -149,7 +151,7 @@ vae.summary()
 
 # region Train and evaluate
 train_dataset, test_dataset = data_utils.load_numpy_dataset(
-    defaults.TRAIN_DATA_DIR, return_tuples=True
+    default_config.TRAIN_DATA_DIR, return_tuples=True
 )
 
 start = time.time()

@@ -231,3 +231,5 @@ data
 logs/
 beatbrain_experiments/
 experiments/
+
+notebooks/models/

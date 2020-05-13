@@ -3,10 +3,10 @@ model:
   architecture: MNISTAutoencoder
   weights_path: null
 hparams:
-  data_root: data/mnist/
+  data_root: data/fashion_mnist/
   batch_size: 32
-  learning_rate: 0.000001
-  # latent_dim: 64  #
+  learning_rate: 0.0001
+  latent_dim: 3
   # image_dims: [512, 640, 1]  # Get this from `spec` instead
   audio:
     duration: null
@@ -24,7 +24,9 @@ hparams:
     top_db: 80
 trainer:
   gpus: [0]
+  max_epochs: 200
   progress_bar_refresh_rate: 1
   logger:
     TestTubeLogger:
       save_dir: experiments/
+      name: fashion_mnist

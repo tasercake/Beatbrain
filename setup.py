@@ -30,6 +30,7 @@ requirements = [
     "addict",
     "numba==0.48.0",
     "cached-property",
+    "more_itertools",
 ]
 
 dev_requirements = [

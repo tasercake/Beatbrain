@@ -5,7 +5,6 @@ from colorama import Fore, Style
 import torch
 from torch.utils.data import DataLoader
 import pytorch_lightning as pl
-from pytorch_lightning import Trainer
 
 from .. import models
 from .. import datasets
@@ -47,11 +46,13 @@ def get_trainer(**kwargs):
     Args:
         **kwargs: Arguments to pass to `Trainer`
     """
-    config = Config(kwargs)
-    config.logger = (
-        get_pl_loggers(**config.logger) if "logger" in config else default_pl_logger
+    trainer_config = Config(kwargs)
+    trainer_config.logger = (
+        get_pl_loggers(**trainer_config.logger)
+        if "logger" in trainer_config
+        else default_pl_logger
     )
-    return Trainer(**config)
+    return pl.Trainer(**trainer_config)
 
 
 def get_pl_loggers(**kwargs):
