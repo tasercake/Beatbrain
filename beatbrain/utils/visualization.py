@@ -5,7 +5,9 @@ import librosa
 import librosa.display
 import IPython.display as ipd
 
-from . import default_config
+from .config import get_default_config
+
+default_config = get_default_config()
 
 
 def show_heatmap(
@@ -59,7 +61,7 @@ def show_spec(
     cmap=None,
     mel=True,
     log=False,
-    sr=default_config.hparams.audio.sample_rate,
+    sr=default_config.hparams.audio.sr,
     hop_length=default_config.hparams.spec.hop_length,
     **kwargs
 ):

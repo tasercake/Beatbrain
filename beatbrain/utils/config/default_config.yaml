@@ -11,9 +11,8 @@ hparams:
   audio:
     duration: null
     offset: 0.0
-    sample_rate: 32768
-    resample_type: kaiser_fast
-    format: wav
+    sr: 44100
+    res_type: kaiser_fast
   spec:
     n_fft: 4096
     hop_length: 256

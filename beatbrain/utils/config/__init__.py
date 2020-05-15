@@ -2,6 +2,7 @@ __all__ = [
     "Config",
     "DEFAULT_CONFIG_PATH",
     "default_config",
+    "get_default_config",
 ]
 
 from pathlib import Path

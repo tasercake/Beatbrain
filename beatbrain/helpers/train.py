@@ -9,7 +9,7 @@ import pytorch_lightning as pl
 from .. import models
 from .. import datasets
 from .. import utils
-from ..utils import Config, default_config
+from ..utils.config import Config, default_config
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
