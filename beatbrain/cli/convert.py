@@ -1,4 +1,5 @@
 import click
+from loguru import logger
 from deprecation import deprecated
 
 from ..utils import data as data_utils
@@ -17,13 +18,7 @@ def convert(ctx):
             bold=True,
         )
     )
-    click.echo(
-        click.style(
-            "The BeatBrain Data Converter is deprecated. Use on-the-fly conversion (and caching) during training instead.",
-            fg="red",
-            bold=True,
-        )
-    )
+    logger.warning("The BeatBrain Data Converter is deprecated. Use on-the-fly conversion (and caching) during training instead.",)
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
 
