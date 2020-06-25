@@ -1,4 +1,5 @@
 import click
+from deprecation import deprecated
 
 from ..utils import data as data_utils
 from ..utils.config import default_config
@@ -27,6 +28,32 @@ def convert(ctx):
         click.echo(ctx.get_help())
 
 
+@convert.command(
+    name="wav",
+    short_help="Convert audio to the .wav format",
+)
+@click.argument("path")
+@click.argument("output")
+@click.option("--sr", default=22050)
+def to_wav(path, output, **kwargs):
+    data_utils.convert_audio_to_wav(path, output, **kwargs)
+
+
+@convert.command(
+    name="split",
+    short_help="Convert audio to the .wav format",
+)
+@click.argument("path")
+@click.argument("output")
+@click.option("--chunk_duration", help="Maximum length of output audio chunks", default=10, show_default=True)
+@click.option("--discard_shorter", help="Discard audio chunks shorter than this many seconds", default=4, show_default=True)
+@click.option("--sr", default=22050)
+def split_audio(path, output, **kwargs):
+    data_utils.split_audio(path, output, **kwargs)
+
+# ==========
+# DEPRECATED
+# ==========
 _converter_options = [
     click.argument("path"),
     click.argument("output"),
@@ -100,6 +127,7 @@ def converter_options(func):
     return func
 
 
+@deprecated()
 @convert.command(
     name="numpy",
     short_help="Convert audio files or EXR images to numpy arrays",
