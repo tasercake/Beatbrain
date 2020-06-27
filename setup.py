@@ -36,6 +36,11 @@ requirements = [
 dev_requirements = [
     "black",
     "jupyter",
+    "pytest",
+    "coverage",
+    "pytest-cov",
+    "codecov",
+    "pytest-dotenv",
 ]
 
 with open("README.md", "r") as fh:
