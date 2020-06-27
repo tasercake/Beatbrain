@@ -4,8 +4,6 @@ Custom layers
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model, Sequential, Input
-from tensorflow.keras import backend as K
-from tensorflow.keras.losses import Loss
 from tensorflow.keras.layers import (
     Conv2D,
     Conv2DTranspose,

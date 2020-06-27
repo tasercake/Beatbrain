@@ -1,11 +1,9 @@
 import math
 import time
 from pathlib import Path
-from fractions import Fraction
 
 # scientific
 import numpy as np
-import beatbrain
 from beatbrain import utils
 from beatbrain.generator.layers import (
     ConvBlock2D,
@@ -25,10 +23,8 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 
 from tensorflow.keras import Model, Sequential, Input, optimizers
-from tensorflow.keras import backend as K
 from tensorflow.keras.utils import plot_model
 
-from tensorflow.keras.losses import Loss
 from tensorflow.keras.layers import (
     Conv2D,
     Conv2DTranspose,
@@ -41,7 +37,6 @@ from tensorflow.keras.layers import (
     Layer,
     concatenate,
     Add,
-    Subtract,
     Multiply,
     BatchNormalization,
     ReLU,
@@ -49,13 +44,7 @@ from tensorflow.keras.layers import (
 )
 from tensorflow.keras.callbacks import (
     Callback,
-    TensorBoard,
     ReduceLROnPlateau,
-    EarlyStopping,
-    ModelCheckpoint,
-    TerminateOnNaN,
-    CSVLogger,
-    LambdaCallback,
 )
 
 
