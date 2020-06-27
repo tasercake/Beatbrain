@@ -3,5 +3,5 @@
 omit = */test_*.py
 
 [report]
-#skip_covered = True
+skip_covered = False
 sort = Cover

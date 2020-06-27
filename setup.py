@@ -36,7 +36,7 @@ requirements = [
 dev_requirements = [
     "black",
     "jupyter",
-    "pytest",
+    "pytest>=5.0.0",
     "coverage",
     "pytest-cov",
     "codecov",
