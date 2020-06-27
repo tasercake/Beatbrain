@@ -6,7 +6,7 @@ from colorama import Fore
 from natsort import natsorted
 from audioread import DecodeError
 
-from .config import Config, default_config
+from .config import Config, get_default_config
 from .misc import DataType, EXTENSIONS
 from .core import (
     save_images,
@@ -18,6 +18,8 @@ from .core import (
     save_arrays,
     spectrogram_to_audio,
 )
+
+default_config = get_default_config()
 
 
 def get_data_type(path, raise_exception=False):

@@ -1,7 +1,9 @@
 import click
 
 from ..utils import data as data_utils
-from ..utils.config import default_config
+from ..utils.config import get_default_config
+
+default_config = get_default_config()
 
 
 @click.group(invoke_without_command=True, short_help="Data Conversion Utilities")

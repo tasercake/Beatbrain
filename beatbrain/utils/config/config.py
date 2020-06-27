@@ -3,16 +3,9 @@ import json
 import copy
 from pathlib import Path
 from pprint import pformat
-from collections import abc
 from copy import deepcopy
 from addict import Dict
 from io import StringIO
-
-# TODO: remove ruamel dependency
-# from ruamel.yaml import YAML, YAMLError
-
-from ..types import Filepath
-from typing import Union, Mapping, Any
 
 
 class Config(Dict):
@@ -24,11 +17,12 @@ class Config(Dict):
     _autoreload_compat_keys = [
         "__class__",
     ]  # Hack to make this class work with Ipython's autoreload
+
     # yaml = YAML()
     # yaml.default_flow_style = None
 
     @classmethod
-    def load(cls, path: Filepath, format: str = "yaml"):
+    def load(cls, path, format: str = "yaml"):
         """
         Instantiate a Config from a YAML or JSON file.
 
@@ -50,7 +44,7 @@ class Config(Dict):
             raise ValueError(f"Unknown format: {format}. Expected json or yaml")
         return cls(data)
 
-    def dump(self, path: Filepath = None, format="yaml"):
+    def dump(self, path = None, format="yaml"):
         """
         Get the string representation of the Config object in the
         specified format, and (optionally) write it to a file.

@@ -2,7 +2,6 @@ import click
 import logging
 from pprint import pprint
 from pyfiglet import Figlet
-from typing import Union
 
 from .. import helpers
 from .. import models
