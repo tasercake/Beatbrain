@@ -28,7 +28,7 @@ before_install:
 install:
   - conda install pytorch torchvision cpuonly -c pytorch
   - pip install pytorch-lightning
-  - pip install .[dev]
+  - pip install -e .[dev]
 
 script:
   - pytest

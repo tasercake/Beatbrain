@@ -17,6 +17,8 @@ requirements = [
     "joblib",
     "natsort",
     "addict",
+    "pyyaml",
+    "cached-property",
     "boltons",
     "deprecation",
     "numba==0.48.0",
