@@ -11,7 +11,7 @@ from pytorch_lightning import Trainer
 from .. import models
 from .. import datasets
 from .. import utils
-from ..utils import Config, get_default_config
+from ..utils.config import Config, get_default_config
 from ..utils import registry
 
 logger = logging.getLogger(__name__)
