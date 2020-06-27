@@ -26,6 +26,8 @@ natsort
 addict
 boltons
 deprecation
+pyyaml
+cached-property
 
 # Compatibility stuff
 numba==0.48.0
