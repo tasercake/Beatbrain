@@ -7,6 +7,11 @@ dev_requirements = [
     "black",
     "pytest",
     "jupyter",
+    "pytest>=5.0.0",
+    "coverage",
+    "pytest-cov",
+    "codecov",
+    "pytest-dotenv",
 ]
 
 with open("README.md", "r") as fh:
@@ -24,7 +29,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.7",
+    python_requires=">=3.6",
     install_requires=requirements,
     extras_require={"dev": dev_requirements,},
     entry_points={"console_scripts": ["beatbrain=beatbrain.__main__:main"]},

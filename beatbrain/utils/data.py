@@ -14,7 +14,7 @@ from natsort import natsorted
 from audioread import DecodeError, NoBackendError
 from deprecation import deprecated
 
-from .config import Config, default_config
+from .config import Config, get_default_config
 from .misc import DataType, EXTENSIONS
 from .core import (
     save_images,
@@ -26,6 +26,8 @@ from .core import (
     save_arrays,
     spectrogram_to_audio,
 )
+
+default_config = get_default_config()
 
 
 def convert_audio_to_wav(inp, out, **kwargs):

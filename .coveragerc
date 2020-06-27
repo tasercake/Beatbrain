@@ -1,0 +1,7 @@
+[run]
+#include = beatbrain/beatbrain
+omit = */test_*.py
+
+[report]
+skip_covered = False
+sort = Cover

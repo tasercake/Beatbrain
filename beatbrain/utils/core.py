@@ -5,8 +5,10 @@ import imageio
 import numpy as np
 from natsort import natsorted
 
-from .config import default_config
+from .config import get_default_config
 from .misc import DataType, EXTENSIONS
+
+default_config = get_default_config()
 
 
 def split_spectrogram(spec, chunk_size, truncate=True, axis=1):

@@ -11,6 +11,7 @@ from pathlib import Path
 from more_itertools import interleave
 
 from ..utils.config import Config
+from ..utils import registry
 
 
 class BasicConv2d(nn.Module):
@@ -57,6 +58,7 @@ class Inception(nn.Module):
         return torch.cat(outputs, 1)
 
 
+@registry.register("model", "MNISTAutoencoder")
 class MNISTAutoencoder(pl.LightningModule):
     def __init__(self, hparams: Config):
         super().__init__()
