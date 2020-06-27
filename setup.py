@@ -24,6 +24,8 @@ setuptools.setup(
     url="https://github.com/tasercake/beatbrain",
     long_description=long_description,
     packages=setuptools.find_packages(),
+    include_package_data=True,
+    package_data={"": ["*.yaml", "*.yml"]},  # Include builtin configs
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
