@@ -1,31 +1,11 @@
 import setuptools
 
-requirements = [
-    "nnAudio",
-    "librosa",
-    "resampy",
-    "imageio",
-    "Pillow",
-    "matplotlib",
-    "seaborn",
-    "click",
-    "loguru",
-    "test-tube",
-    "colorama",
-    "pyfiglet",
-    "tqdm",
-    "joblib",
-    "natsort",
-    "addict",
-    "pyyaml",
-    "cached-property",
-    "boltons",
-    "deprecation",
-    "numba==0.48.0",
-]
+with open("requirements.txt") as f:
+    requirements = f.read().splitlines()
 
 dev_requirements = [
     "black",
+    "pytest",
     "jupyter",
     "pytest>=5.0.0",
     "coverage",
@@ -52,5 +32,5 @@ setuptools.setup(
     python_requires=">=3.6",
     install_requires=requirements,
     extras_require={"dev": dev_requirements,},
-    entry_points={"console_scripts": ["beatbrain=beatbrain.cli:main"]},
+    entry_points={"console_scripts": ["beatbrain=beatbrain.__main__:main"]},
 )

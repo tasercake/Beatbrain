@@ -1,12 +1,8 @@
 from pyfiglet import Figlet
-import logging
+from loguru import logger
 import click
 
 from . import convert, models
-
-# TODO: use `loguru` for logging
-logger = logging.getLogger(__name__)
-logging.basicConfig()
 
 
 @click.group(invoke_without_command=True)
