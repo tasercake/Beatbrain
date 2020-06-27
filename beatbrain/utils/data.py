@@ -1,10 +1,18 @@
+import os
+import errno
+import warnings
+from loguru import logger
 import librosa
 import soundfile as sf
 from tqdm import tqdm
+from boltons.pathutils import augpath
+import joblib
+from joblib import Parallel, delayed
 from pathlib import Path
 from colorama import Fore
 from natsort import natsorted
-from audioread import DecodeError
+from audioread import DecodeError, NoBackendError
+from deprecation import deprecated
 
 from .config import Config, default_config
 from .misc import DataType, EXTENSIONS
@@ -20,6 +28,69 @@ from .core import (
 )
 
 
+def convert_audio_to_wav(inp, out, **kwargs):
+    """
+    inp can be file or directory
+    out must be a directory (TODO: allow file)
+    **kwargs are passed to librosa.load()
+    """
+    inp = Path(inp)
+    out = Path(out)
+    if not inp.exists():
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), str(inp))
+    out.mkdir(exist_ok=True, parents=True)
+    input_files = [f for f in inp.iterdir() if f.is_file()] if inp.is_dir() else [inp]
+    output_files = [augpath(f, ext=".wav", dpath=out) for f in input_files]
+    logger.info(f"Converting {len(input_files)} file(s) to .wav: {Fore.YELLOW}{inp}{Fore.RESET} -> {Fore.YELLOW}{out}{Fore.RESET}")
+    def convert_one(src, dst):
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", module="librosa")
+            try:
+                audio, sr = librosa.load(src, mono=True, **kwargs)
+            except (NoBackendError, DecodeError):
+                logger.error(f"Failed to read {src}")
+                return
+            sf.write(dst, audio, sr)
+    Parallel(n_jobs=-1)(delayed(convert_one)(i, o) for i, o in tqdm(zip(input_files, output_files), total=len(input_files)))
+
+
+def split_audio(inp, out, chunk_duration=10, discard_shorter=None, **kwargs):
+    """
+    Split an audio file or directory of audio files into wav files of the desired duration.
+    Args:
+        chunk_duration (float): Maximum duration of each output wav file (in seconds)
+        discard_shorter (float): Minimum duration of output wav files. This parameter determines. Segments shorter than this are discarded.
+    """
+    inp = Path(inp)
+    out = Path(out)
+    if not inp.exists():
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), str(inp))
+    out.mkdir(exist_ok=True, parents=True)
+    input_files = [str(f) for f in inp.iterdir() if f.is_file()] if inp.is_dir() else [inp]
+    output_files = [augpath(f, dpath=out, ext=".wav") for f in input_files]
+    logger.info(f"Splitting {len(input_files)} audio file(s): {Fore.YELLOW}{inp}{Fore.RESET} -> {Fore.YELLOW}{out}{Fore.RESET}")
+    def split_one(src, dst):
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", module="librosa")
+            try:
+                audio, sr = librosa.load(src, mono=True, **kwargs)
+            except (NoBackendError, DecodeError):
+                logger.error(f"Failed to read {src}")
+                return
+        chunk_samples = chunk_duration * sr
+        for i, start in enumerate(range(0, len(audio), chunk_samples)):
+            chunk = audio[start: start + chunk_samples]
+            if discard_shorter and len(chunk) < discard_shorter * sr:
+                break
+            dst_i = augpath(dst, suffix=f"_{i + 1}")
+            sf.write(dst_i, chunk, sr)
+    Parallel(n_jobs=-1)(delayed(split_one)(i, o) for i, o in tqdm(zip(input_files, output_files), total=len(input_files)))
+
+
+# ==========
+# DEPRECATED
+# ==========
+@deprecated()
 def get_data_type(path, raise_exception=False):
     """
     Given a file or directory, return the (homogeneous) data type contained in that path.
@@ -65,6 +136,7 @@ def get_data_type(path, raise_exception=False):
     return dtype
 
 
+@deprecated()
 def get_paths(inp, directories=False, sort=True):
     """
     Recursively get the filenames under a given path
@@ -88,6 +160,7 @@ def get_paths(inp, directories=False, sort=True):
 
 
 # TODO: Consolidate these functions into one
+@deprecated()
 def get_numpy_output_path(path, out_dir, inp):
     path = Path(path)
     out_dir = Path(out_dir)
@@ -98,6 +171,7 @@ def get_numpy_output_path(path, out_dir, inp):
     return output
 
 
+@deprecated()
 def get_image_output_path(path, out_dir, inp):
     path = Path(path)
     out_dir = Path(out_dir)
@@ -108,6 +182,7 @@ def get_image_output_path(path, out_dir, inp):
     return output
 
 
+@deprecated()
 def get_audio_output_path(path, out_dir, inp, fmt):
     path = Path(path)
     out_dir = Path(out_dir)
@@ -118,6 +193,7 @@ def get_audio_output_path(path, out_dir, inp, fmt):
     return output
 
 
+@deprecated()
 def load_dataset(
     path,
     flip=default_config.hparams.spec.flip,

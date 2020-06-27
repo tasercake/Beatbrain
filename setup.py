@@ -1,40 +1,11 @@
 import setuptools
 
-requirements = [
-    "umap",
-    "seaborn",
-    "colorama",
-    "tqdm",
-    "IPython",
-    "matplotlib",
-    "joblib",
-    "click",
-    "numpy",
-    "Pillow",
-    "imageio",
-    "natsort",
-    "ffmpeg",
-    "librosa",
-    "soundfile",
-    "pydot",
-    "pydotplus",
-    "graphviz",
-    "python-dotenv",
-    "requests",
-    "mutagen",
-    "pyfiglet",
-    "pytorch-lightning",
-    "test-tube",
-    "torchsummary",
-    "nnAudio",
-    "addict",
-    "numba==0.48.0",
-    "cached-property",
-    "more_itertools",
-]
+with open("requirements.txt") as f:
+    requirements = f.read().splitlines()
 
 dev_requirements = [
     "black",
+    "pytest",
     "jupyter",
 ]
 
@@ -56,5 +27,5 @@ setuptools.setup(
     python_requires=">=3.7",
     install_requires=requirements,
     extras_require={"dev": dev_requirements,},
-    entry_points={"console_scripts": ["beatbrain=beatbrain.cli:main"]},
+    entry_points={"console_scripts": ["beatbrain=beatbrain.__main__:main"]},
 )

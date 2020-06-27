@@ -1,0 +1,31 @@
+# Install these yourself
+#torch
+#torchvision
+#pytorch-lightning
+
+# Scientific
+nnAudio
+librosa
+resampy
+imageio
+Pillow
+matplotlib
+seaborn
+
+# CLI & Logging
+click
+loguru
+test-tube
+colorama
+pyfiglet
+
+# Misc
+tqdm
+joblib
+natsort
+addict
+boltons
+deprecation
+
+# Compatibility stuff
+numba==0.48.0
