@@ -2,8 +2,10 @@ import torch
 from torch.utils.data import Dataset, Subset
 import torchvision
 from torchvision import transforms
+from ..utils import registry
 
 
+@registry.register("dataset", "FMADataset")
 class FMADataset(Dataset):
     def __init__(self, root_dir):
         super().__init__()
