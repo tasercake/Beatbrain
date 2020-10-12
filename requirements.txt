@@ -29,6 +29,7 @@ boltons
 deprecation
 pyyaml
 cached-property
+more-itertools
 
 # Compatibility stuff
 numba==0.48.0

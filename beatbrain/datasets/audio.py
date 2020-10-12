@@ -14,7 +14,6 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset
 import torchvision
 from torchvision import transforms
-from nnAudio import Spectrogram
 from ..utils import registry
 
 
@@ -29,7 +28,7 @@ class AudioClipDataset(Dataset):
     ):
         super().__init__()
         self.directory = Path(directory)
-        self.audio_load_options = {"sr": 44100, "res_type": "kaiser_fast"}
+        self.audio_load_options = {"sr": 22050, "res_type": "kaiser_fast"}
         if audio_load_options:
             self.audio_load_options.update(audio_load_options)
         self.transform = transform or self.default_transform
@@ -51,7 +50,10 @@ class AudioClipDataset(Dataset):
         def get_duration(f):
             try:
                 # Loads metadata only, but unsure of filetype support
-                return mutagen.File(f).info.length
+                mutagen_file = mutagen.File(f)
+                if not mutagen_file:
+                    raise mutagen.MutagenError
+                return mutagen_file.info.length
             except mutagen.MutagenError:
                 # Probably loads the entire file before length can be calculated
                 with audioread.audio_open(f) as audio:
