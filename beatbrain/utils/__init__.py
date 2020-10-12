@@ -50,6 +50,13 @@ class registry:
                 return key
             raise KeyError(f"Couldn't find '{key}' in registry '{registry_name}'") from e
 
+    @classmethod
+    def unique(cls, registry_name: str):
+        reverse_registry = {}
+        for key, value in cls.registries[registry_name].items():
+            reverse_registry.setdefault(value, []).append(key)
+        return {names[0]: names[1:] for names in reverse_registry.values()}
+
     # TODO: Implement custom registration the right way
     # @classmethod
     # def register_model(cls, name: str, model_class: Type):
