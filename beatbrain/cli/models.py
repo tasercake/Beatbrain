@@ -1,6 +1,5 @@
 import click
 import logging
-from pprint import pprint
 from pyfiglet import Figlet
 
 from .. import helpers
@@ -14,10 +13,17 @@ logging.basicConfig(level=logging.INFO)
 @click.pass_context
 def models_group(ctx):
     """
-    Pantheon-AI/models: View, train, evaluate, and run inference on ML models.
+    BeatBrain/models: View, train, evaluate, and run inference on ML models.
     """
-    f = Figlet(font="doom")
-    # click.echo(click.style(f.renderText("models"), fg="bright_blue", bold=True,))
+    click.echo(
+        click.style(
+            "----------------\n"
+            "BeatBrain Models\n"
+            "----------------\n",
+            fg="green",
+            bold=True,
+        )
+    )
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
 
@@ -35,7 +41,7 @@ def train_model(*args, **kwargs):
 
 
 @models_group.command(name="list", short_help="List available models")
-def list_models(*args, **kwargs):
+def list_models():
     """
     Prints a list of registered model classes.
     """

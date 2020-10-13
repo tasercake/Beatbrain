@@ -99,6 +99,7 @@ class AudioClipDataset(Dataset):
             index_remainder = index - self.cumulative_num_track_segments[track_index - 1]
         track_path = self.paths[track_index]
         with sf.SoundFile(str(track_path)) as file:
+            # Get track info
             track_sample_rate = file.samplerate
             start_pos = track_sample_rate * self.max_segment_length * index_remainder
             num_samples = track_sample_rate * self.max_segment_length
@@ -114,10 +115,10 @@ class AudioClipDataset(Dataset):
             else:
                 output_sr = self.sample_rate
                 audio = resampy.resample(audio, track_sample_rate, output_sr, filter="kaiser_fast")
-            # Optionally convert to mono
+
+            # Optionally downmix to mono
             if self.mono and audio.ndim > 1:
                 audio = audio.mean(0, keepdims=True)
-            # Convert to tensor
             return audio, output_sr
 
     def __len__(self):

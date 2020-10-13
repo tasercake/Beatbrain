@@ -1,11 +1,7 @@
 import click
 from loguru import logger
-from deprecation import deprecated
 
 from ..utils import data as data_utils
-from ..utils.config import get_default_config
-
-default_config = get_default_config()
 
 
 @click.group(invoke_without_command=True, short_help="Data Conversion Utilities")

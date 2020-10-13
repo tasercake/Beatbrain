@@ -3,7 +3,7 @@ from inspect import isclass, ismodule
 from functools import lru_cache
 
 import torch
-from . import models, helpers, metrics
+from . import helpers, metrics
 
 logger = logging.getLogger(__name__)
 

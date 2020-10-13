@@ -7,7 +7,6 @@ from torchvision import transforms
 import pytorch_lightning as pl
 
 from cached_property import cached_property
-from pathlib import Path
 from more_itertools import interleave
 
 from ..utils.config import Config
