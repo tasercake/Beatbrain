@@ -5,7 +5,9 @@ import librosa
 import librosa.display
 import IPython.display as ipd
 
-from . import default_config
+from .config import Config, get_default_config
+
+default_config = get_default_config()
 
 
 def show_heatmap(

@@ -1,5 +1,4 @@
 from pyfiglet import Figlet
-from loguru import logger
 import click
 
 from . import convert, models

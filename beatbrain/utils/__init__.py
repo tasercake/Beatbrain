@@ -4,18 +4,9 @@ Low-level utility classes and functions.
 NOTE: Modules in `utils` shouldn't import from other Pantheon-AI packages.
 Try to limit imports to within this package.
 """
-# import imageio
-# imageio.plugins.freeimage.download()
+from . import data, config, visualization, misc, core
 
-from . import data
-from .config import *
-# from .core import *
-# from .misc import *
-
-import logging
 from typing import Type
-
-logger = logging.getLogger(__name__)
 
 
 class registry:
@@ -29,11 +20,10 @@ class registry:
         Args:
             registry_name: Name of the registry to add the entry to
             key: Name to file the entry under
-            value: The value of the entry
         """
         def inner(obj):
-            registry = cls.registries.setdefault(registry_name, {})
-            registry[key] = obj
+            reg = cls.registries.setdefault(registry_name, {})
+            reg[key] = obj
             return obj
         return inner
 
@@ -48,24 +38,22 @@ class registry:
             allow_passthrough: If True, then if `key` is not a key in the specified registry but is present as a value in the registry, `key` is returned.
         """
         try:
-            registry = cls.registries[registry_name]
+            reg = cls.registries[registry_name]
         except KeyError as e:
             raise KeyError(f"No such registry: '{registry_name}'") from e
         try:
-            return registry[key]
+            return reg[key]
         except KeyError as e:
-            if key in registry.values() and allow_passthrough:
+            if key in reg.values() and allow_passthrough:
                 return key
             raise KeyError(f"Couldn't find '{key}' in registry '{registry_name}'") from e
 
-    # TODO: Implement custom registration the right way
-    # @classmethod
-    # def register_model(cls, name: str, model_class: Type):
-    #     return cls.register("model", name)(model_class)
-    #
-    # @classmethod
-    # def register_dataset(cls, name: str, dataset_class: Type):
-    #     return cls.register("dataset", name)(dataset_class)
+    @classmethod
+    def unique(cls, registry_name: str):
+        reverse_registry = {}
+        for key, value in cls.registries[registry_name].items():
+            reverse_registry.setdefault(value, []).append(key)
+        return {names[0]: names[1:] for names in reverse_registry.values()}
 
     @classmethod
     def get_dataset(cls, name: str) -> Type:

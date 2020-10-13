@@ -11,7 +11,7 @@ from pytorch_lightning import Trainer
 from .. import models
 from .. import datasets
 from .. import utils
-from ..utils import Config, get_default_config
+from ..utils.config import Config, get_default_config
 from ..utils import registry
 
 logger = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ def train_model(config: Config):
     )
     val_dataloader = DataLoader(val_dataset)
 
-    trainer = get_trainer(config.trainer)
+    trainer = get_trainer(**config.trainer)
     trainer.fit(model, train_dataloader=train_dataloader)
     return model
 
