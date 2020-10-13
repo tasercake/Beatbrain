@@ -4,12 +4,13 @@
 #pytorch-lightning
 
 # Scientific
-nnAudio
+nnAudio==0.1.1
 librosa
+soundfile
 resampy
-mutagen
 imageio
 Pillow
+numpy
 matplotlib
 seaborn
 

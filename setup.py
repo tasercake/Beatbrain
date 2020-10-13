@@ -6,7 +6,6 @@ with open("requirements.txt") as f:
 dev_requirements = [
     "black",
     "pytest",
-    "jupyter",
     "pytest>=5.0.0",
     "coverage",
     "pytest-cov",
@@ -19,7 +18,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="beatbrain",
-    version="1.0.0",
+    version="0.0.1",
     author="Krishna Penukonda",
     url="https://github.com/tasercake/beatbrain",
     long_description=long_description,
