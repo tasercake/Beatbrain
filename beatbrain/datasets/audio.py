@@ -64,7 +64,7 @@ class AudioClipDataset(Dataset):
         self.paths = np.asarray(natsorted(self.paths))
 
         # Count the number of segments in each audio file
-        self.num_track_segments = np.array(Parallel(n_jobs=-1)(delayed(get_num_segments)(str(path), self.max_segment_length, self.min_segment_length) for path in self.paths))
+        self.num_track_segments = np.array(Parallel(n_jobs=-1, backend="threading")(delayed(get_num_segments)(str(path), self.max_segment_length, self.min_segment_length) for path in self.paths))
         # Find and exclude unusable tracks (either unreadable or too short)
         valid_tracks_mask = self.num_track_segments > 0
         invalid_tracks_mask = ~valid_tracks_mask

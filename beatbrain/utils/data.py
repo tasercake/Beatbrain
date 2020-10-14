@@ -66,7 +66,7 @@ def convert_audio(inp, out, format="flac", split=False, chunk_duration=10, disca
 
     if split:
         logger.info(f"Splitting {len(input_files)} audio file(s): {Fore.YELLOW}{inp}{Fore.RESET} -> {Fore.YELLOW}{out}{Fore.RESET}")
-        Parallel(n_jobs=-1)(delayed(split_one)(i, o) for i, o in tqdm(zip(input_files, output_files), total=len(input_files)))
+        Parallel(n_jobs=-1, backend="threading")(delayed(split_one)(i, o) for i, o in tqdm(zip(input_files, output_files), total=len(input_files)))
     else:
         logger.info(f"Converting {len(input_files)} file(s) to {format.upper()}: {Fore.YELLOW}{inp}{Fore.RESET} -> {Fore.YELLOW}{out}{Fore.RESET}")
-        Parallel(n_jobs=-1)(delayed(convert_one)(i, o) for i, o in tqdm(zip(input_files, output_files), total=len(input_files)))
+        Parallel(n_jobs=-1, backend="threading")(delayed(convert_one)(i, o) for i, o in tqdm(zip(input_files, output_files), total=len(input_files)))
