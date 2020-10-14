@@ -39,10 +39,11 @@ def get_num_segments(path, max_segment_length, min_segment_length):
 
 @registry.register("dataset", "AudioClipDataset")
 class AudioClipDataset(Dataset):
-    def __init__(self, paths, max_segment_length=10, min_segment_length=4, sample_rate=22050, mono=True):
+    def __init__(self, paths, recursive=True, max_segment_length=5, min_segment_length=1, sample_rate=22050, mono=True):
         """
         Args:
-            paths: A path or a collection of paths (file or directory). If a collection of paths is provided, they must all be of the same type.
+            paths: A path (file or directory) or a collection of file paths.
+            recursive (bool): Whether to recursively search for audio files when a directory is provided
             max_segment_length (float): The maximum length (in seconds) of each audio segment.
             min_segment_length (float): The minimum length (in seconds) of each audio segment. Shorter segments are discarded.
             sample_rate (int): The rate at which to resample audio. If `None`, no resampling is performed.
@@ -50,6 +51,7 @@ class AudioClipDataset(Dataset):
         """
         super().__init__()
         # Store params
+        self.recursive = recursive
         self.max_segment_length = max_segment_length
         self.min_segment_length = min_segment_length
         self.sample_rate = sample_rate
@@ -58,7 +60,10 @@ class AudioClipDataset(Dataset):
         # Scan for files
         try:  # Single file or directory
             paths = Path(paths)
-            self.paths = list(paths.iterdir()) if paths.is_dir() else [paths]
+            if paths.is_dir():
+                self.paths = list(paths.rglob("*") if self.recursive else paths.iterdir())
+            else:
+                self.paths = [paths]
         except TypeError:  # Collection of files
             self.paths = list(map(Path, paths))
         self.paths = np.asarray(natsorted(self.paths))
