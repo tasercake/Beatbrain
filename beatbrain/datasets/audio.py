@@ -67,6 +67,8 @@ class AudioClipDataset(Dataset):
         except TypeError:  # Collection of files
             self.paths = list(map(Path, paths))
         self.paths = np.asarray(natsorted(self.paths))
+        if len(self.paths) == 0:
+            raise ValueError(f"Couldn't find any valid audio files in {paths}")
 
         # Count the number of segments in each audio file
         self.num_track_segments = np.array(Parallel(n_jobs=-1, backend="threading")(delayed(get_num_segments)(str(path), self.max_segment_length, self.min_segment_length) for path in self.paths))
@@ -93,6 +95,7 @@ class AudioClipDataset(Dataset):
         Returns:
             tuple: A 2D `np.float32` array of raw audio, and the audio's sample rate
         """
+        # TODO: Fix crash when using a DataLoader with several workers
         if index < 0:
             index = self.num_total_segments + index
         if index >= len(self):
@@ -112,19 +115,21 @@ class AudioClipDataset(Dataset):
             # Load raw audio
             file.seek(start_pos)
             audio = file.read(num_samples, dtype=np.float32, fill_value=0, always_2d=True)
-            audio = audio.T  # Channel-first index order
 
-            # Resample if required
-            if self.sample_rate is None or self.sample_rate == track_sample_rate:
-                output_sr = track_sample_rate
-            else:
-                output_sr = self.sample_rate
-                audio = resampy.resample(audio, track_sample_rate, output_sr, filter="kaiser_fast")
+        # Channel-first index order
+        audio = audio.T
 
-            # Optionally downmix to mono
-            if self.mono and audio.ndim > 1:
-                audio = audio.mean(0, keepdims=True)
-            return audio, output_sr
+        # Resample if required
+        if self.sample_rate is None or self.sample_rate == track_sample_rate:
+            output_sr = track_sample_rate
+        else:
+            output_sr = self.sample_rate
+            audio = resampy.resample(audio, track_sample_rate, output_sr, filter="kaiser_fast")
+
+        # Optionally downmix to mono
+        if self.mono and audio.ndim > 1:
+            audio = audio.mean(0, keepdims=True)
+        return audio, output_sr
 
     def __len__(self):
         return self.num_total_segments
