@@ -7,8 +7,9 @@ from nnAudio import Spectrogram
 class InvertibleMelSpectrogram(Spectrogram.MelSpectrogram):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.trainable_mel = kwargs.get("trainable_mel")
-        self.trainable_stft = kwargs.get("trainable_stft")
+        self.trainable_mel = kwargs.get("trainable_mel", False)
+        self.trainable_stft = kwargs.get("trainable_stft", False)
+        self.verbose = kwargs.get("verbose", False)
 
     def to_stft(self, melspec, max_steps=1000, loss_threshold=1e-12, psnr_threshold=200, change_threshold=1e-16, sgd_kwargs=None, lr_scheduler_kwargs=None, eps=1e-12, return_extras=False,):
         """
@@ -27,7 +28,7 @@ class InvertibleMelSpectrogram(Spectrogram.MelSpectrogram):
             default_sgd_kwargs.update(sgd_kwargs)
         sgd_kwargs = default_sgd_kwargs
         # ReduceLROnPlateau arguments
-        default_scheduler_kwargs = dict(factor=0.1, patience=500, threshold=1e-6, min_lr=1e2, verbose=True)
+        default_scheduler_kwargs = dict(factor=0.1, patience=500, threshold=1e-6, min_lr=1e2, verbose=self.verbose)
         if lr_scheduler_kwargs:
             default_scheduler_kwargs.update(lr_scheduler_kwargs)
         lr_scheduler_kwargs = default_scheduler_kwargs
@@ -53,6 +54,8 @@ class InvertibleMelSpectrogram(Spectrogram.MelSpectrogram):
             scheduler.step(loss)
 
             # Check conditions
+            if not loss.isfinite():
+                raise OverflowError("Overflow encountered in Mel -> STFT optimization")
             if psnr(pred_mel, melspec) >= psnr_threshold:
                 if self.verbose:
                     print(f"Target Mel PSNR of {psnr_threshold} reached. Stopping optimization.")
@@ -70,3 +73,13 @@ class InvertibleMelSpectrogram(Spectrogram.MelSpectrogram):
         if return_extras:
             return pred_stft, pred_mel.detach(), losses
         return pred_stft
+
+
+def psnr(pred, target, target_top=True, top=1e4):
+    """
+    Peak Signal-to-Noise Ratio (but not really)
+    Since spectrograms values are unbounded, this function uses `max(target)` as the maximum possible value by default.
+    """
+    if target_top:
+        top = target.max()
+    return 20 * torch.log10(top / torch.sqrt(F.mse_loss(pred, target)))
