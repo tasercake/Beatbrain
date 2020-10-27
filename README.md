@@ -6,9 +6,8 @@
 ![BeatBrain Logo](images/logo/256h/BeatBrain_Fit_256x.png)
 
 
-# CDS_Report 
-Please refer to the pdf document called CDS_report.
-Direct link: https://github.com/tasercake/BeatBrain/blob/master/CDS%20report.pdf
+# Research & Results 
+Direct link: https://github.com/tasercake/Beatbrain/blob/3c5c93232e5fe8292ce3824bee189a2bd266ee33/CDS%20report.pdf
 
 # Installing
 
