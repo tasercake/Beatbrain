@@ -6,8 +6,7 @@
 ![BeatBrain Logo](images/logo/256h/BeatBrain_Fit_256x.png)
 
 
-# Research & Results 
-Direct link: https://github.com/tasercake/Beatbrain/blob/3c5c93232e5fe8292ce3824bee189a2bd266ee33/CDS%20report.pdf
+# [Research & Results](https://github.com/tasercake/Beatbrain/blob/3c5c93232e5fe8292ce3824bee189a2bd266ee33/CDS%20report.pdf)
 
 # Installing
 
