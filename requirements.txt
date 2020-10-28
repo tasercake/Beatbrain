@@ -4,11 +4,10 @@
 #pytorch-lightning
 
 # Scientific
-nnAudio==0.1.4a0
+nnAudio==0.1.5a0
 librosa
 soundfile
 resampy
-mutagen
 imageio
 Pillow
 numpy
