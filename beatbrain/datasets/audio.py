@@ -39,7 +39,7 @@ def get_num_segments(path, max_segment_length, min_segment_length):
 
 @registry.register("dataset", "AudioClipDataset")
 class AudioClipDataset(Dataset):
-    def __init__(self, paths, recursive=True, max_segment_length=5, min_segment_length=1, sample_rate=22050, mono=True):
+    def __init__(self, paths, recursive=True, max_segment_length=5, min_segment_length=1, sample_rate=22050, mono=True, pad=True):
         """
         Args:
             paths: A path (file or directory) or a collection of file paths.
@@ -56,12 +56,13 @@ class AudioClipDataset(Dataset):
         self.min_segment_length = min_segment_length
         self.sample_rate = sample_rate
         self.mono = mono
+        self.pad = pad
 
         # Scan for files
         try:  # Single file or directory
             paths = Path(paths)
             if paths.is_dir():
-                self.paths = list(paths.rglob("*") if self.recursive else paths.iterdir())
+                self.paths = list(filter(lambda f: f.is_file(), paths.rglob("*") if self.recursive else paths.iterdir()))
             else:
                 self.paths = [paths]
         except TypeError:  # Collection of files
@@ -114,7 +115,7 @@ class AudioClipDataset(Dataset):
 
             # Load raw audio
             file.seek(start_pos)
-            audio = file.read(num_samples, dtype=np.float32, fill_value=0, always_2d=True)
+            audio = file.read(num_samples, dtype=np.float32, fill_value=0 if self.pad else None, always_2d=True)
 
         # Channel-first index order
         audio = audio.T
