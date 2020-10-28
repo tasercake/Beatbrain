@@ -66,16 +66,7 @@ class InvertibleMelSpectrogram(Spectrogram.MelSpectrogram):
                 break
 
         pred_stft = pred_stft.detach().clamp(eps) ** 0.5
+        pred_stft = pred_stft.view((*shape[:-2], n_freq, time))
         if return_extras:
             return pred_stft, pred_mel.detach(), losses
-        return pred_stft.view((*shape[:-2], freq, time))
-
-
-def psnr(pred, target, target_top=True, top=1e4):
-    """
-    Peak Signal-to-Noise Ratio (but not really)
-    Since spectrograms values are unbounded, this function uses `max(target)` as the maximum possible value by default.
-    """
-    if target_top:
-        top = target.max()
-    return 20 * torch.log10(top / torch.sqrt(F.mse_loss(pred, target)))
+        return pred_stft
