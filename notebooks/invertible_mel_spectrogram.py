@@ -11,7 +11,7 @@ class InvertibleMelSpectrogram(Spectrogram.MelSpectrogram):
         self.trainable_stft = kwargs.get("trainable_stft", False)
         self.verbose = kwargs.get("verbose", False)
 
-    def to_stft(self, melspec, max_steps=1000, loss_threshold=1e-12, psnr_threshold=200, change_threshold=1e-16, sgd_kwargs=None, lr_scheduler_kwargs=None, eps=1e-12, return_extras=False,):
+    def to_stft(self, melspec, max_steps=1000, loss_threshold=1e-8, grad_threshold=1e-7, random_start=False, sgd_kwargs=None, eps=1e-12, return_extras=False, verbose=None):
         """
         Best-attempt spectrogram inversion
         """
@@ -19,29 +19,30 @@ class InvertibleMelSpectrogram(Spectrogram.MelSpectrogram):
             pred = pred.unsqueeze(1) if pred.ndim == 3 else pred
             target = target.unsqueeze(1) if target.ndim == 3 else target
 
-            loss = (pred - target).pow(2).mean()
+            loss = (pred - target).pow(2).sum(-2).mean()
             return loss
 
+        verbose = verbose or self.verbose
         # SGD arguments
-        default_sgd_kwargs = dict(lr=1e6, momentum=0.9)
+        default_sgd_kwargs = dict(lr=1e3, momentum=0.9)
         if sgd_kwargs:
             default_sgd_kwargs.update(sgd_kwargs)
         sgd_kwargs = default_sgd_kwargs
-        # ReduceLROnPlateau arguments
-        default_scheduler_kwargs = dict(factor=0.1, patience=500, threshold=1e-6, min_lr=1e2, verbose=self.verbose)
-        if lr_scheduler_kwargs:
-            default_scheduler_kwargs.update(lr_scheduler_kwargs)
-        lr_scheduler_kwargs = default_scheduler_kwargs
 
-        melspec = melspec.detach()
         mel_basis = self.mel_basis.detach()
-        pred_stft = (torch.pinverse(mel_basis) @ melspec).clamp(eps)
-#         pred_stft_shape = (melspec.shape[0], mel_basis.shape[-1], melspec.shape[-1])
-#         pred_stft = torch.zeros(*pred_stft_shape, dtype=torch.float32, device=DEVICE).normal_().clamp_(eps)
+        shape = melspec.shape
+        batch_size, n_mels, time = shape[0], shape[-2], shape[-1]
+        _, n_freq = mel_basis.shape
+        melspec = melspec.detach().view(-1, n_mels, time)
+        if random_start:
+            pred_stft_shape = (batch_size, n_freq, time)
+            pred_stft = torch.zeros(*pred_stft_shape, dtype=torch.float32, device=mel_basis.device).normal_().clamp_(eps)
+        else:
+            pred_stft = (torch.pinverse(mel_basis) @ melspec).clamp(eps)
         pred_stft = nn.Parameter(pred_stft, requires_grad=True)
 
+        sgd_kwargs["lr"] = sgd_kwargs["lr"] * batch_size
         optimizer = torch.optim.SGD([pred_stft], **sgd_kwargs)
-        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, **lr_scheduler_kwargs)
 
         losses = []
         for i in range(max_steps):
@@ -51,28 +52,23 @@ class InvertibleMelSpectrogram(Spectrogram.MelSpectrogram):
             losses.append(loss.item())
             loss.backward()
             optimizer.step()
-            scheduler.step(loss)
 
             # Check conditions
             if not loss.isfinite():
                 raise OverflowError("Overflow encountered in Mel -> STFT optimization")
-            if psnr(pred_mel, melspec) >= psnr_threshold:
-                if self.verbose:
-                    print(f"Target Mel PSNR of {psnr_threshold} reached. Stopping optimization.")
-                break
-            if loss <= loss_threshold:
-                if self.verbose:
+            if loss_threshold and loss < loss_threshold:
+                if verbose:
                     print(f"Target error of {loss_threshold} reached. Stopping optimization.")
                 break
-            if i > 1 and abs(losses[-2] - losses[-1]) <= change_threshold:
-                if self.verbose:
-                    print(f"Target loss change of {change_threshold} reached. Stopping optimization.")
+            if grad_threshold and pred_stft.grad.max() < grad_threshold:
+                if verbose:
+                    print(f"Target max gradient of {grad_threshold} reached. Stopping optimization.")
                 break
 
         pred_stft = pred_stft.detach().clamp(eps) ** 0.5
         if return_extras:
             return pred_stft, pred_mel.detach(), losses
-        return pred_stft
+        return pred_stft.view((*shape[:-2], freq, time))
 
 
 def psnr(pred, target, target_top=True, top=1e4):
