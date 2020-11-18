@@ -4,7 +4,8 @@
 #pytorch-lightning
 
 # Scientific
-nnAudio==0.1.5a0
+nnAudio==0.2.0
+#git+https://github.com/tasercake/nnAudio@27f3b46aff0061077a43957259ba6355d520b6bf#subdirectory=Installation
 librosa
 soundfile
 resampy
