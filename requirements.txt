@@ -5,7 +5,7 @@
 
 # Scientific
 nnAudio==0.2.0
-#git+https://github.com/tasercake/nnAudio@27f3b46aff0061077a43957259ba6355d520b6bf#subdirectory=Installation
+#git+https://github.com/tasercake/nnAudio@70696906904ff4f4dd631f907689ea9182961bf6#subdirectory=Installation
 librosa
 soundfile
 resampy
