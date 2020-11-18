@@ -4,11 +4,11 @@
 #pytorch-lightning
 
 # Scientific
-nnAudio==0.1.1
+nnAudio==0.2.0
+#git+https://github.com/tasercake/nnAudio@70696906904ff4f4dd631f907689ea9182961bf6#subdirectory=Installation
 librosa
 soundfile
 resampy
-mutagen
 imageio
 Pillow
 numpy
